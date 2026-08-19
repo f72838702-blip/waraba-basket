@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
-import { getMemberById, getAllMembers } from "@/lib/members";
+import { getMemberById, getAllMembers } from "@/lib/members-data";
 import MemberCard from "@/components/MemberCard";
 
 /**

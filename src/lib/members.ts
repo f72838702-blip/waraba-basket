@@ -2,10 +2,11 @@ import type { Member } from "@/types/member";
 
 /**
  * Données de démonstration des membres.
- * À remplacer par une requête Supabase :
- *   const { data } = await supabase.from("members").select("*").eq("id", id).single()
+ * Servent de repli quand Supabase n'est pas configuré ou injoignable
+ * (voir `members-data.ts`). Ces données restent côté client sûr :
+ * aucun secret ni accès base de données ici.
  */
-const MEMBERS: Member[] = [
+export const DEMO_MEMBERS: Member[] = [
   {
     id: "0001",
     full_name: "Ibrahim Touré",
@@ -32,13 +33,10 @@ const MEMBERS: Member[] = [
   },
 ];
 
-export async function getMemberById(id: string): Promise<Member | undefined> {
-  return MEMBERS.find((m) => m.id === id);
-}
-
-export async function getAllMembers(): Promise<Member[]> {
-  return MEMBERS;
-}
+/**
+ * Récupération des membres (Supabase) — côté serveur uniquement.
+ * @see src/lib/members-data.ts  (ne pas importer depuis un composant client)
+ */
 
 /** Initiales affichées quand aucune photo n'est disponible. */
 export function getInitials(fullName: string): string {
