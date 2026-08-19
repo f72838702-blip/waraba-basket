@@ -49,11 +49,7 @@ export const getAllMembers = cache(async (): Promise<Member[]> => {
 
   if (error) {
     console.warn("[Waraba Basket] getAllMembers: erreur Supabase —", error.message);
-    return DEMO_MEMBERS;
-  }
-
-  if (!data || data.length === 0) {
-    return DEMO_MEMBERS;
+    return [];
   }
 
   return (data as MemberRow[]).map(toMember);
@@ -72,13 +68,12 @@ export const getMemberById = cache(async (id: string): Promise<Member | undefine
 
   if (error) {
     console.warn("[Waraba Basket] getMemberById: erreur Supabase —", error.message);
-    return DEMO_MEMBERS.find((m) => m.id === id);
+    return undefined;
   }
 
   if (!data) {
-    // Pas de membre en base pour cet id : repli démo si l'id correspond,
-    // sinon undefined → notFound() côté page.
-    return DEMO_MEMBERS.find((m) => m.id === id);
+    // Pas de membre en base pour cet id → undefined → notFound() côté page.
+    return undefined;
   }
 
   return toMember(data as MemberRow);
