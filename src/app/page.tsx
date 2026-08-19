@@ -292,14 +292,14 @@ export default function Home() {
               className="group inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3.5 font-bold text-midnight transition hover:scale-105 hover:bg-gold-light"
             >
               <Users className="h-5 w-5" />
-              S'inscrire au club
+              S&apos;inscrire au club
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
             </a>
             <a
               href="#"
               className="inline-flex items-center gap-2 rounded-full border border-white/30 px-7 py-3.5 font-semibold text-white transition hover:bg-white/10"
             >
-              Découvrir l'effectif
+              Découvrir l&apos;effectif
             </a>
           </div>
         </div>

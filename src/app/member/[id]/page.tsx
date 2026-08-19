@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 import { getMemberById, getAllMembers } from "@/lib/members-data";
+import { fullName } from "@/lib/members";
 import MemberCard from "@/components/MemberCard";
 
 /**
@@ -19,9 +21,10 @@ export async function generateMetadata({
   const { id } = await params;
   const member = await getMemberById(id);
   if (!member) return { title: "Membre introuvable — Waraba Basket" };
+  const name = fullName(member);
   return {
-    title: `${member.full_name} — Carte de membre`,
-    description: `Carte de membre officielle de ${member.full_name} (${member.role}, ${member.category}).`,
+    title: `${name} — Carte de membre`,
+    description: `Carte de membre officielle de ${name} (${member.role}, ${member.category}).`,
   };
 }
 
@@ -38,13 +41,13 @@ export default async function MemberCardPage({
   return (
     <main className="flex flex-1 flex-col items-center px-6 py-16">
       <div className="w-full max-w-2xl">
-        <a
+        <Link
           href="/"
           className="no-print mb-6 inline-flex items-center gap-2 text-sm text-slate-400 transition hover:text-gold-light"
         >
           <ArrowLeft className="h-4 w-4" />
           Retour à l&apos;accueil
-        </a>
+        </Link>
 
         <MemberCard member={member} />
       </div>

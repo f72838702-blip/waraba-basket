@@ -14,21 +14,31 @@ import { DEMO_MEMBERS } from "@/lib/members";
 
 type MemberRow = {
   id: string;
-  full_name: string;
-  role: string;
-  category: string;
-  status: MemberStatus;
+  first_name: string | null;
+  last_name: string | null;
+  role: string | null;
+  category: string | null;
+  status: MemberStatus | null;
   photo_url: string | null;
+  position: string | null;
+  shirt_number: number | null;
+  height_cm: number | null;
+  weight_kg: number | null;
 };
 
 function toMember(row: MemberRow): Member {
   return {
     id: row.id,
-    full_name: row.full_name,
-    role: row.role,
-    category: row.category,
-    status: row.status,
+    first_name: row.first_name ?? "",
+    last_name: row.last_name ?? "",
+    role: row.role ?? "",
+    category: row.category ?? "",
+    status: (row.status ?? "inactive") as MemberStatus,
     photo_url: row.photo_url,
+    position: row.position,
+    shirt_number: row.shirt_number,
+    height_cm: row.height_cm,
+    weight_kg: row.weight_kg,
   };
 }
 
