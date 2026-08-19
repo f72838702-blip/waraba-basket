@@ -1,5 +1,6 @@
 import "server-only";
 import { cache } from "react";
+import { randomUUID } from "node:crypto";
 import type { Member, MemberStatus } from "@/types/member";
 import { supabaseServer, isSupabaseConfigured } from "@/lib/supabase-server";
 import { DEMO_MEMBERS } from "@/lib/members";
@@ -142,4 +143,58 @@ export async function insertMember(
   }
 
   return { id: (data as { id: string }).id };
+}
+
+// ---- Upload des photos membre (Supabase Storage) ----
+
+/** Bucket Storage public accueillant les photos de membres. */
+export const PHOTOS_BUCKET = "members-photos";
+const PHOTO_MAX_BYTES = 4 * 1024 * 1024; // 4 Mo
+const PHOTO_ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp"];
+
+/** Extension de fichier selon le type MIME (défaut : jpg). */
+function mimeToExt(mime: string): string {
+  if (mime === "image/png") return "png";
+  if (mime === "image/webp") return "webp";
+  return "jpg";
+}
+
+/**
+ * Upload d'une photo de membre vers le bucket Storage public, côté serveur
+ * (client service role). Retourne l'URL publique à stocker dans `photo_url`,
+ * ou une erreur métier. Le fichier doit provenir d'un FormData de Server Action.
+ */
+export async function uploadMemberPhoto(
+  file: File
+): Promise<{ url: string } | { error: string }> {
+  if (!isSupabaseConfigured) {
+    return { error: "Supabase n'est pas configuré — upload impossible." };
+  }
+  if (!file || file.size === 0) {
+    return { error: "Fichier photo vide." };
+  }
+  if (file.size > PHOTO_MAX_BYTES) {
+    return { error: "La photo dépasse 4 Mo." };
+  }
+  const mime = file.type || "image/jpeg";
+  if (!PHOTO_ALLOWED_MIME.includes(mime)) {
+    return { error: "Format non supporté (jpg, png ou webp uniquement)." };
+  }
+
+  const path = `photo_${randomUUID()}.${mimeToExt(mime)}`;
+  const arrayBuffer = await file.arrayBuffer();
+
+  const { error } = await supabaseServer.storage
+    .from(PHOTOS_BUCKET)
+    .upload(path, arrayBuffer, { contentType: mime, upsert: false });
+
+  if (error) {
+    console.warn("[Waraba Basket] uploadMemberPhoto: erreur —", error.message);
+    return { error: error.message };
+  }
+
+  const { data } = supabaseServer.storage
+    .from(PHOTOS_BUCKET)
+    .getPublicUrl(path);
+  return { url: data.publicUrl };
 }

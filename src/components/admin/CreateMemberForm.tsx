@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Loader2,
@@ -8,6 +8,10 @@ import {
   Plus,
   ExternalLink,
   User,
+  Camera,
+  ImagePlus,
+  X,
+  Link2,
 } from "lucide-react";
 import {
   createMemberAction,
@@ -44,6 +48,34 @@ function FormBlock({ onReset }: { onReset: () => void }) {
     createMemberAction,
     initialState
   );
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+  // Ouvre le sélecteur : `capture` force la caméra arrière sur mobile, absent
+  // pour laisser le choix galerie/fichier.
+  function pickPhoto(useCamera: boolean) {
+    const el = fileInputRef.current;
+    if (!el) return;
+    if (useCamera) {
+      el.setAttribute("capture", "environment");
+    } else {
+      el.removeAttribute("capture");
+    }
+    el.click();
+  }
+
+  function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(file ? URL.createObjectURL(file) : null);
+  }
+
+  function clearPhoto() {
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (photoPreview) URL.revokeObjectURL(photoPreview);
+    setPhotoPreview(null);
+  }
 
   // Une création réussie : on affiche un panneau de confirmation au-dessus du
   // formulaire (qui reste vide, prêt pour la fiche suivante).
@@ -144,16 +176,77 @@ function FormBlock({ onReset }: { onReset: () => void }) {
             </label>
           </div>
 
-          {/* Photo URL */}
-          <label className="block">
-            <span className={labelBase}>Photo (URL)</span>
+          {/* Photo : caméra ou fichier (upload vers Supabase Storage) */}
+          <div>
+            <span className={labelBase}>Photo</span>
+
+            {/* Aperçu + bouton supprimer */}
+            {photoPreview && (
+              <div className="mb-3 inline-flex items-center gap-3 rounded-xl border border-white/10 bg-midnight p-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photoPreview}
+                  alt="Aperçu photo"
+                  className="h-20 w-20 rounded-lg object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={clearPhoto}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-sm text-slate-300 transition hover:border-red-500/40 hover:text-red-300"
+                >
+                  <X className="h-4 w-4" />
+                  Supprimer
+                </button>
+              </div>
+            )}
+
+            {/* Input fichier unique : capture dynamique selon le bouton cliqué */}
             <input
-              type="url"
-              name="photo_url"
-              placeholder="https://… (laisser vide si pas de photo)"
-              className={fieldBase}
+              ref={fileInputRef}
+              type="file"
+              name="photo_file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={onPhotoChange}
+              className="hidden"
             />
-          </label>
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => pickPhoto(true)}
+                className="inline-flex items-center gap-2 rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-midnight transition hover:bg-gold-light"
+              >
+                <Camera className="h-4 w-4" />
+                Prendre une photo
+              </button>
+              <button
+                type="button"
+                onClick={() => pickPhoto(false)}
+                className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/5"
+              >
+                <ImagePlus className="h-4 w-4" />
+                Choisir un fichier
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-slate-500">
+              jpg, png ou webp — 4 Mo max. Sur mobile, « Prendre une photo »
+              ouvre la caméra ; sur ordinateur, le sélecteur de fichiers.
+            </p>
+
+            {/* Alternative : coller une URL */}
+            <label className="mt-3 block">
+              <span className="mb-1.5 block text-xs font-medium text-slate-500">
+                <Link2 className="mr-1 inline h-3 w-3" />
+                ou collez une URL de photo
+              </span>
+              <input
+                type="url"
+                name="photo_url"
+                placeholder="https://… (facultatif, ignoré si une photo est sélectionnée)"
+                className={fieldBase}
+              />
+            </label>
+          </div>
 
           <hr className="border-white/10" />
 

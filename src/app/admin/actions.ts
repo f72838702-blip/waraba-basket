@@ -8,7 +8,7 @@ import {
   createAdminSession,
   clearAdminSession,
 } from "@/lib/auth";
-import { insertMember, type NewMemberInput } from "@/lib/members-data";
+import { insertMember, uploadMemberPhoto, type NewMemberInput } from "@/lib/members-data";
 import type { MemberStatus } from "@/types/member";
 
 /**
@@ -110,8 +110,21 @@ export async function createMemberAction(
   const height_cm = parseOptionalInt(formData.get("height_cm"));
   const weight_kg = parseOptionalInt(formData.get("weight_kg"));
 
-  const photoRaw = str(formData.get("photo_url"));
-  const photo_url = photoRaw === "" ? null : photoRaw;
+  // Photo : un fichier uploadé (caméra ou mémoire) prend la priorité sur le
+  // champ URL. Si aucun des deux n'est renseigné → null (initiales affichées).
+  const photoFile = formData.get("photo_file");
+  let photo_url: string | null = null;
+
+  if (photoFile instanceof File && photoFile.size > 0) {
+    const uploaded = await uploadMemberPhoto(photoFile);
+    if ("error" in uploaded) {
+      return { error: `Photo : ${uploaded.error}` };
+    }
+    photo_url = uploaded.url;
+  } else {
+    const photoRaw = str(formData.get("photo_url"));
+    photo_url = photoRaw === "" ? null : photoRaw;
+  }
 
   const input: NewMemberInput = {
     first_name,
