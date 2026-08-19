@@ -88,3 +88,58 @@ export const getMemberById = cache(async (id: string): Promise<Member | undefine
 
   return toMember(data as MemberRow);
 });
+
+/** Charge utile d'insertion d'un membre (tous les champs gérés par le back-office). */
+export type NewMemberInput = {
+  first_name: string;
+  last_name: string;
+  role: string;
+  category: string;
+  status: MemberStatus;
+  photo_url: string | null;
+  position: string | null;
+  shirt_number: number | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+};
+
+/**
+ * Insère un nouveau membre côté serveur (client service role, RLS contournée).
+ * `full_name` reste obligatoire en base (NOT NULL + index de tri) : on le
+ * reconstitue à partir de first_name/last_name même si l'app l'ignore.
+ * Retourne l'UUID du membre créé ou une erreur métier.
+ */
+export async function insertMember(
+  input: NewMemberInput
+): Promise<{ id: string } | { error: string }> {
+  if (!isSupabaseConfigured) {
+    return { error: "Supabase n'est pas configuré — insertion impossible." };
+  }
+
+  const full_name = `${input.first_name} ${input.last_name}`.trim();
+
+  const { data, error } = await supabaseServer
+    .from("members")
+    .insert({
+      full_name,
+      first_name: input.first_name,
+      last_name: input.last_name,
+      role: input.role,
+      category: input.category,
+      status: input.status,
+      photo_url: input.photo_url,
+      position: input.position,
+      shirt_number: input.shirt_number,
+      height_cm: input.height_cm,
+      weight_kg: input.weight_kg,
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    console.warn("[Waraba Basket] insertMember: erreur Supabase —", error.message);
+    return { error: error.message };
+  }
+
+  return { id: (data as { id: string }).id };
+}
