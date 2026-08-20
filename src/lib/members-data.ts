@@ -90,8 +90,9 @@ export const getMemberById = cache(async (id: string): Promise<Member | undefine
   return toMember(data as MemberRow);
 });
 
-/** Charge utile d'insertion d'un membre (tous les champs gérés par le back-office). */
-export type NewMemberInput = {
+/** Charge utile d'un membre (tous les champs gérés par le back-office). Sert à
+ * l'insertion (create) comme à la mise à jour (update). */
+export type MemberInput = {
   first_name: string;
   last_name: string;
   role: string;
@@ -111,7 +112,7 @@ export type NewMemberInput = {
  * Retourne l'UUID du membre créé ou une erreur métier.
  */
 export async function insertMember(
-  input: NewMemberInput
+  input: MemberInput
 ): Promise<{ id: string } | { error: string }> {
   if (!isSupabaseConfigured) {
     return { error: "Supabase n'est pas configuré — insertion impossible." };
@@ -197,4 +198,126 @@ export async function uploadMemberPhoto(
     .from(PHOTOS_BUCKET)
     .getPublicUrl(path);
   return { url: data.publicUrl };
+}
+
+// ---- Édition / suppression d'un membre ----
+
+/**
+ * Extrait le chemin de l'objet Storage depuis une URL publique de photo.
+ * Les URLs publiques Supabase sont de la forme :
+ *   https://<project>.supabase.co/storage/v1/object/public/members-photos/<path>
+ * Retourne `null` si l'URL n'appartient pas à notre bucket (URL externe collée
+ * via le champ URL) → dans ce cas il n'y a rien à supprimer côté Storage.
+ */
+function storagePathFromPhotoUrl(url: string | null): string | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    const marker = `/storage/v1/object/public/${PHOTOS_BUCKET}/`;
+    const idx = u.pathname.indexOf(marker);
+    if (idx === -1) return null;
+    return decodeURIComponent(u.pathname.slice(idx + marker.length));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Supprime l'objet Storage d'une photo de membre. **Best-effort** : une erreur
+ * de suppression (objet déjà absent, problème réseau) est seulement loggée et
+ * ne bloque pas l'opération métier (update/delete du membre). Exportée pour
+ * que l'action d'édition puisse libérer l'ancienne photo lors d'un remplacement.
+ */
+export async function deleteMemberPhoto(url: string | null): Promise<void> {
+  const path = storagePathFromPhotoUrl(url);
+  if (!path) return; // URL externe ou absente → rien à faire.
+  const { error } = await supabaseServer.storage
+    .from(PHOTOS_BUCKET)
+    .remove([path]);
+  if (error) {
+    console.warn(
+      "[Waraba Basket] deleteMemberPhoto: suppression Storage ignorée —",
+      error.message
+    );
+  }
+}
+
+/**
+ * Met à jour un membre côté serveur (client service role). `full_name` est
+ * reconstitué (NOT NULL + index de tri). La gestion de la photo (upload nouvelle
+ * / suppression / conservation) est à la charge de l'action appelante, qui
+ * passe ici le `photo_url` final.
+ */
+export async function updateMember(
+  id: string,
+  input: MemberInput
+): Promise<{ ok: true } | { error: string }> {
+  if (!isSupabaseConfigured) {
+    return { error: "Supabase n'est pas configuré — mise à jour impossible." };
+  }
+
+  const full_name = `${input.first_name} ${input.last_name}`.trim();
+
+  const { error } = await supabaseServer
+    .from("members")
+    .update({
+      full_name,
+      first_name: input.first_name,
+      last_name: input.last_name,
+      role: input.role,
+      category: input.category,
+      status: input.status,
+      photo_url: input.photo_url,
+      position: input.position,
+      shirt_number: input.shirt_number,
+      height_cm: input.height_cm,
+      weight_kg: input.weight_kg,
+    })
+    .eq("id", id);
+
+  if (error) {
+    console.warn("[Waraba Basket] updateMember: erreur Supabase —", error.message);
+    return { error: error.message };
+  }
+
+  return { ok: true };
+}
+
+/**
+ * Supprime un membre côté serveur : récupère sa photo (pour nettoyer le bucket
+ * Storage), supprime l'objet photo (best-effort), puis supprime la ligne.
+ * Retourne `{ ok: true }` ou une erreur métier.
+ */
+export async function deleteMember(
+  id: string
+): Promise<{ ok: true } | { error: string }> {
+  if (!isSupabaseConfigured) {
+    return { error: "Supabase n'est pas configuré — suppression impossible." };
+  }
+
+  // 1) Récupère la photo actuelle (pour libérer le bucket Storage).
+  const { data: row, error: feErr } = await supabaseServer
+    .from("members")
+    .select("photo_url")
+    .eq("id", id)
+    .maybeSingle();
+  if (feErr) {
+    console.warn(
+      "[Waraba Basket] deleteMember: erreur lecture photo —",
+      feErr.message
+    );
+  }
+  const photoUrl = (row as { photo_url: string | null } | null)?.photo_url ?? null;
+
+  // 2) Nettoyage Storage (best-effort, ne bloque pas la suite).
+  await deleteMemberPhoto(photoUrl);
+
+  // 3) Suppression de la ligne.
+  const { error } = await supabaseServer.from("members").delete().eq("id", id);
+  if (error) {
+    console.warn("[Waraba Basket] deleteMember: erreur Supabase —", error.message);
+    return { error: error.message };
+  }
+
+  return { ok: true };
 }
