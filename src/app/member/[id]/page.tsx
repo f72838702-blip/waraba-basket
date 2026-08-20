@@ -2,19 +2,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
-import { getMemberById, getAllMembers } from "@/lib/members-data";
+import { getMemberById } from "@/lib/members-data";
 import { fullName } from "@/lib/members";
+import { isAdmin } from "@/lib/auth";
 import MemberCard from "@/components/MemberCard";
 
 /**
  * Carte de membre officielle — Waraba Basket.
  * Route : /member/[id]
+ *
+ * La lecture du cookie admin (`isAdmin()`) rend la route dynamique : un
+ * visiteur normal voit la carte seule ; l'admin connecté voit en plus la
+ * barre « Espace admin » (Modifier / Supprimer) sur la carte.
  */
-export async function generateStaticParams() {
-  const members = await getAllMembers();
-  return members.map((member) => ({ id: member.id }));
-}
-
 export async function generateMetadata({
   params,
 }: PageProps<"/member/[id]">): Promise<Metadata> {
@@ -38,6 +38,9 @@ export default async function MemberCardPage({
     notFound();
   }
 
+  // L'admin connecté obtient les boutons Modifier / Supprimer sur la carte.
+  const canEdit = await isAdmin();
+
   return (
     <main className="flex flex-1 flex-col items-center px-6 py-16">
       <div className="w-full max-w-2xl">
@@ -49,7 +52,7 @@ export default async function MemberCardPage({
           Retour à l&apos;accueil
         </Link>
 
-        <MemberCard member={member} />
+        <MemberCard member={member} canEdit={canEdit} />
       </div>
     </main>
   );

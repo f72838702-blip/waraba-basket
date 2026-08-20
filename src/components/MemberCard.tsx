@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -12,6 +13,8 @@ import {
   Ruler,
   Scale,
   Target,
+  Pencil,
+  Lock,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { Member } from "@/types/member";
@@ -22,9 +25,13 @@ import {
   formatWeight,
 } from "@/lib/members";
 import { generateQrCodeDataUrl } from "@/lib/qrcode";
+import DeleteMemberButton from "@/components/admin/DeleteMemberButton";
 
 interface MemberCardProps {
   member: Member;
+  /** True si le visiteur est l'admin authentifié → affiche les boutons
+   * Modifier / Supprimer sur la carte (cachés pour le public, à l'impression). */
+  canEdit?: boolean;
 }
 
 /**
@@ -32,7 +39,7 @@ interface MemberCardProps {
  * Photo + numéro de maillot en badge, identité + stats (Poste / Maillot /
  * Taille / Poids) en grille, QR code de vérification, statut de licence.
  */
-export default function MemberCard({ member }: MemberCardProps) {
+export default function MemberCard({ member, canEdit }: MemberCardProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [memberUrl, setMemberUrl] = useState<string>("");
   const [loadingQr, setLoadingQr] = useState(true);
@@ -92,6 +99,24 @@ export default function MemberCard({ member }: MemberCardProps) {
           </span>
         </div>
       </header>
+
+      {/* ===== Barre admin (uniquement si l'admin est connecté) ===== */}
+      {canEdit && (
+        <div className="no-print flex flex-wrap items-center gap-2 border-b border-gold/20 bg-royal-dark/50 px-6 py-3">
+          <span className="mr-auto inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold-light">
+            <Lock className="h-3.5 w-3.5" />
+            Espace admin
+          </span>
+          <Link
+            href={`/admin/members/${member.id}/edit`}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-sm font-semibold text-white transition hover:border-gold/40 hover:text-gold-light"
+          >
+            <Pencil className="h-4 w-4" />
+            Modifier
+          </Link>
+          <DeleteMemberButton id={member.id} name={fullName(member)} />
+        </div>
+      )}
 
       {/* ===== Corps : photo + identité/stats ===== */}
       <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-[auto_1fr]">
