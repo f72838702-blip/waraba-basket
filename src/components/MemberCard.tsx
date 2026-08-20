@@ -83,7 +83,7 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
   return (
     <article className="print-card overflow-hidden rounded-3xl border border-white/10 bg-midnight-light shadow-2xl">
       {/* ===== Bandeau supérieur ===== */}
-      <header className="flex items-center justify-between bg-royal px-6 py-4">
+      <header className="mc-header flex items-center justify-between bg-royal px-6 py-4">
         <div className="flex items-center gap-2 text-white">
           <span className="text-lg" aria-hidden>
             🏀
@@ -119,11 +119,11 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
       )}
 
       {/* ===== Corps : photo + identité/stats ===== */}
-      <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-[auto_1fr]">
+      <div className="mc-body grid grid-cols-1 gap-6 p-6 sm:grid-cols-[auto_1fr]">
         {/* Colonne gauche : photo + badge maillot */}
         <div className="flex justify-center sm:block">
           <div className="relative h-32 w-32 flex-shrink-0">
-            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border-4 border-gold/40 bg-royal-dark">
+            <div className="mc-photo flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border-4 border-gold/40 bg-royal-dark">
               {member.photo_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -180,10 +180,10 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
       </div>
 
       {/* ===== Bas : QR + statut + actions ===== */}
-      <div className="flex flex-col items-center gap-4 border-t border-white/10 px-6 py-5 sm:flex-row sm:items-stretch">
+      <div className="mc-foot flex flex-col items-center gap-4 border-t border-white/10 px-6 py-5 sm:flex-row sm:items-stretch">
         {/* QR code */}
         <div className="flex flex-col items-center gap-1">
-          <div className="rounded-xl border border-white/10 bg-white p-2">
+          <div className="mc-qr rounded-xl border border-white/10 bg-white p-2">
             {loadingQr ? (
               <div className="flex h-[88px] w-[88px] items-center justify-center">
                 <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
@@ -207,21 +207,21 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
         {/* Statut + licence */}
         <div className="flex flex-1 flex-col items-center justify-center gap-2 sm:items-start">
           {isActive ? (
-            <div className="flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-4 py-2.5">
+            <div className="mc-status-active flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-4 py-2.5">
               <ShieldCheck className="h-5 w-5 flex-shrink-0 text-emerald-400" />
               <span className="text-sm font-semibold uppercase tracking-wide text-emerald-400">
                 ✓ Licence valide
               </span>
             </div>
           ) : (
-            <div className="flex items-center gap-2 rounded-xl border border-red-500/40 bg-red-500/15 px-4 py-2.5">
+            <div className="mc-status-inactive flex items-center gap-2 rounded-xl border border-red-500/40 bg-red-500/15 px-4 py-2.5">
               <ShieldAlert className="h-5 w-5 flex-shrink-0 text-red-400" />
               <span className="text-sm font-semibold uppercase tracking-wide text-red-400">
                 ✗ Licence inactive
               </span>
             </div>
           )}
-          <p className="font-mono text-xs text-slate-400">
+          <p className="mc-licence font-mono text-xs text-slate-400">
             Licence&nbsp;: <span className="text-gold-light">WB-{member.id}</span>
           </p>
         </div>
@@ -252,6 +252,12 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
           {memberUrl}
         </p>
       )}
+
+      {/* Pied de carte officiel — visible uniquement à l'impression */}
+      <div className="print-only border-t border-slate-200 px-6 py-3 text-center text-[11px] uppercase tracking-wider text-slate-500">
+        Carte officielle Waraba Basket — vérifiez l&apos;authenticité en
+        scannant le QR code
+      </div>
     </article>
   );
 }
@@ -267,7 +273,7 @@ function StatTile({
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-midnight px-3 py-2.5">
+    <div className="mc-tile flex items-center gap-3 rounded-xl border border-white/10 bg-midnight px-3 py-2.5">
       <Icon className="h-5 w-5 flex-shrink-0 text-gold-light" />
       <div className="min-w-0">
         <p className="text-[10px] uppercase tracking-wide text-slate-500">
