@@ -38,21 +38,15 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-/* Contenu visible uniquement à l'impression (caché à l'écran). */
-.print-only {
-  display: none;
-}
-
 /* ============================================================
-   Impression de la carte de membre
-   La carte écran est sombre (fond midnight, texte clair). Par défaut
-   les navigateurs n'impriment pas les fonds → on repense la carte
-   pour l'impression : fond blanc, texte foncé, accents de marque
-   (barre bleu royal + liseré or) forcés via print-color-adjust.
+   Impression / export PDF de la carte de membre
+   La carte est déjà un badge blanc / or / bleu royal (design écran
+   = design impression). On force juste l'impression des couleurs
+   d'accent (print-color-adjust) et on cadre la page.
    ============================================================ */
 @media print {
   @page {
-    margin: 1.2cm;
+    margin: 1cm;
   }
 
   html,
@@ -60,128 +54,24 @@ body {
     background: #ffffff !important;
   }
 
-  /* Masque tout le chrome écran (retour, actions, barre admin, URL). */
+  /* Masque le chrome écran (retour, actions, barre admin, URL). */
   .no-print {
     display: none !important;
   }
 
-  /* Affiche le pied de carte officiel. */
-  .print-only {
-    display: block !important;
-  }
-
-  /* Force l'impression des couleurs sur la carte (barre, badges, bordures). */
+  /* Force l'impression des couleurs de la carte (bleu royal, or, statut). */
   .print-card,
   .print-card * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  /* La carte : fond blanc, cadre bleu royal, centrée, tient sur une page. */
+  /* La carte : centrée, tient sur une page, sans ombre. */
   .print-card {
-    background: #ffffff !important;
-    color: #0f172a !important;
-    border: 2px solid #1e3a8a !important;
-    border-radius: 16px !important;
     box-shadow: none !important;
-    max-width: 15cm !important;
+    max-width: 16cm !important;
     margin: 0 auto !important;
     break-inside: avoid;
-  }
-
-  /* Bandeau supérieur : on garde le bleu royal + liseré or + texte blanc. */
-  .print-card .mc-header {
-    background: #1e3a8a !important;
-    color: #ffffff !important;
-    border-bottom: 3px solid #d97706 !important;
-  }
-  .print-card .mc-header * {
-    color: #ffffff !important;
-  }
-
-  /* Corps : fond blanc, textes foncés. */
-  .print-card .mc-body {
-    background: #ffffff !important;
-  }
-  .print-card .mc-body h2 {
-    color: #0f172a !important;
-  }
-  .print-card .mc-body p {
-    color: #334155 !important;
-  }
-  /* Ligne rôle · catégorie en or foncé (lisible sur blanc). */
-  .print-card .mc-body .text-gold-light {
-    color: #b45309 !important;
-  }
-
-  /* Photo : bordure or, fond neutre clair, initiales en or foncé. */
-  .print-card .mc-photo {
-    background: #f1f5f9 !important;
-    border-color: #d97706 !important;
-  }
-  .print-card .mc-photo .text-gold-light {
-    color: #b45309 !important;
-  }
-
-  /* Badge maillot (cercle or) : on garde l'or, texte foncé, bordure blanche. */
-  .print-card .mc-photo ~ .bg-gold,
-  .print-card .bg-gold {
-    background: #d97706 !important;
-    color: #0f172a !important;
-    border-color: #ffffff !important;
-  }
-
-  /* Tuiles de stats : fond très clair, texte foncé, bordure fine, icône or. */
-  .print-card .mc-tile {
-    background: #f8fafc !important;
-    border-color: #e2e8f0 !important;
-  }
-  .print-card .mc-tile .text-gold-light {
-    color: #b45309 !important;
-  }
-  .print-card .mc-tile p {
-    color: #0f172a !important;
-  }
-  .print-card .mc-tile .text-slate-500 {
-    color: #64748b !important;
-  }
-
-  /* Bas de carte : séparateur clair. */
-  .print-card .mc-foot {
-    border-top-color: #e2e8f0 !important;
-  }
-  .print-card .mc-foot .text-slate-500 {
-    color: #64748b !important;
-  }
-
-  /* QR : cadre clair sur fond blanc. */
-  .print-card .mc-qr {
-    border-color: #e2e8f0 !important;
-    background: #ffffff !important;
-  }
-
-  /* Badge de statut : on garde la couleur sémantique, texte plus foncé. */
-  .print-card .mc-status-active {
-    background: #ecfdf5 !important;
-    border-color: #059669 !important;
-  }
-  .print-card .mc-status-active .text-emerald-400 {
-    color: #047857 !important;
-  }
-  .print-card .mc-status-inactive {
-    background: #fef2f2 !important;
-    border-color: #dc2626 !important;
-  }
-  .print-card .mc-status-inactive .text-red-400 {
-    color: #b91c1c !important;
-  }
-
-  /* Licence : texte gris foncé, identifiant en or foncé. */
-  .print-card .mc-licence {
-    color: #475569 !important;
-  }
-  .print-card .mc-licence .text-gold-light {
-    color: #b45309 !important;
   }
 }
 

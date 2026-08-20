@@ -7,7 +7,6 @@ import {
   ShieldAlert,
   Printer,
   Download,
-  IdCard,
   Loader2,
   Hash,
   Ruler,
@@ -34,10 +33,129 @@ interface MemberCardProps {
   canEdit?: boolean;
 }
 
+/** Étoile à 8 branches (crinière stylisée) du lion Waraba. */
+const LION_MANE =
+  "M50,4 L59.95,26 L82.5,17.5 L74,40 L96,50 L74,60 L82.5,82.5 L60,74 L50,96 L40,74 L17.5,82.5 L26,60 L4,50 L26,40 L17.5,17.5 L40,26 Z";
+
 /**
- * Carte de membre officielle — style « trading card ».
- * Photo + numéro de maillot en badge, identité + stats (Poste / Maillot /
- * Taille / Poids) en grille, QR code de vérification, statut de licence.
+ * Emblème du lion Waraba (waraba = lion). Crinière en étoile + face + traits.
+ * - `currentColor` sert à la crinière et aux traits.
+ * - `faceColor` sert au disque intérieur de la face (contraste).
+ * `detailed={false}` ne dessine que la crinière + la face (filigrane propre).
+ */
+function LionMark({
+  className,
+  faceColor = "#172554",
+  detailed = true,
+}: {
+  className?: string;
+  faceColor?: string;
+  detailed?: boolean;
+}) {
+  return (
+    <svg viewBox="0 0 100 100" className={className} fill="none" aria-hidden>
+      <path d={LION_MANE} fill="currentColor" />
+      <circle cx="50" cy="52" r="21" fill={faceColor} />
+      {detailed && (
+        <g fill="currentColor">
+          <circle cx="42" cy="48" r="2.6" />
+          <circle cx="58" cy="48" r="2.6" />
+          <path d="M50 54 L45 60.5 Q50 63.5 55 60.5 Z" />
+        </g>
+      )}
+      {detailed && (
+        <path
+          d="M50 61 L50 65.5 M50 65.5 Q45 68.5 41.5 65.5 M50 65.5 Q55 68.5 58.5 65.5"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          fill="none"
+        />
+      )}
+    </svg>
+  );
+}
+
+/** Petite icône de terrain de basket (pour l'en-tête « Carte membre officielle »). */
+function CourtIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      aria-hidden
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M3 8.5 Q6 12 3 15.5 M21 8.5 Q18 12 21 15.5" />
+    </svg>
+  );
+}
+
+/** Filigrane de fond : grandes lignes de terrain + lion central, très discrets. */
+function CardWatermark() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden text-royal"
+      aria-hidden
+    >
+      {/* Lignes de terrain (faint, centrées) */}
+      <svg
+        viewBox="0 0 240 140"
+        className="absolute left-1/2 top-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 opacity-[0.06]"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+      >
+        <rect x="4" y="4" width="232" height="132" rx="8" />
+        <line x1="120" y1="4" x2="120" y2="136" />
+        <circle cx="120" cy="70" r="24" />
+        <rect x="4" y="42" width="40" height="56" />
+        <rect x="196" y="42" width="40" height="56" />
+        <path d="M4 16 Q44 70 4 124" />
+        <path d="M236 16 Q196 70 236 124" />
+      </svg>
+      {/* Tête de lion centrale (faint) */}
+      <LionMark
+        className="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 opacity-[0.045]"
+        faceColor="#0F172A"
+        detailed={false}
+      />
+    </div>
+  );
+}
+
+/** Tuile d'attribut : en-tête bleu royal dégradé + icône or, valeur dessous. */
+function StatTile({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-gold/60 bg-white shadow-sm">
+      <div className="flex items-center justify-center gap-1.5 bg-gradient-to-r from-royal to-royal-light px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-gold-light">
+        <Icon className="h-3.5 w-3.5" />
+        {label}
+      </div>
+      <div className="px-2 py-2 text-center text-base font-black text-midnight sm:text-lg">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Carte de membre officielle — badge premium d'accréditation sportive.
+ * Rendu vertical (type VIP / carte d'accès), filigrane lion + terrain,
+ * couleurs Waraba (Bleu Royal / Or / Blanc). Optimisé pour l'impression PDF.
  */
 export default function MemberCard({ member, canEdit }: MemberCardProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
@@ -81,28 +199,35 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
   };
 
   return (
-    <article className="print-card overflow-hidden rounded-3xl border border-white/10 bg-midnight-light shadow-2xl">
-      {/* ===== Bandeau supérieur ===== */}
-      <header className="mc-header flex items-center justify-between bg-royal px-6 py-4">
-        <div className="flex items-center gap-2 text-white">
-          <span className="text-lg" aria-hidden>
-            🏀
-          </span>
-          <span className="text-sm font-bold uppercase tracking-wider">
-            Waraba Basket
-          </span>
+    <article className="print-card relative mx-auto w-full max-w-[26rem] overflow-hidden rounded-[1.75rem] border-2 border-gold bg-white text-midnight shadow-2xl">
+      <CardWatermark />
+
+      {/* ===== En-tête : Bleu Royal, lion or à gauche, terrain à droite ===== */}
+      <header className="mc-header relative z-10 flex items-center justify-between gap-3 bg-royal px-5 py-4">
+        <div className="flex items-center gap-2.5">
+          <LionMark className="h-9 w-9 text-gold" faceColor="#172554" />
+          <div className="leading-tight">
+            <p className="text-base font-black uppercase tracking-wider text-gold sm:text-lg">
+              Waraba Basket
+            </p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/80">
+              Club de Basketball
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-gold-light">
-          <IdCard className="h-5 w-5" />
-          <span className="text-xs font-semibold uppercase tracking-wider">
+        <div className="flex items-center gap-1.5 text-gold-light">
+          <CourtIcon className="h-5 w-5" />
+          <span className="hidden text-[10px] font-bold uppercase leading-tight tracking-wider sm:inline">
             Carte Membre
+            <br />
+            Officielle
           </span>
         </div>
       </header>
 
       {/* ===== Barre admin (uniquement si l'admin est connecté) ===== */}
       {canEdit && (
-        <div className="no-print flex flex-wrap items-center gap-2 border-b border-gold/20 bg-royal-dark/50 px-6 py-3">
+        <div className="no-print relative z-10 flex flex-wrap items-center gap-2 border-b border-gold/20 bg-royal-dark/50 px-5 py-3">
           <span className="mr-auto inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold-light">
             <Lock className="h-3.5 w-3.5" />
             Espace admin
@@ -118,12 +243,12 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
         </div>
       )}
 
-      {/* ===== Corps : photo + identité/stats ===== */}
-      <div className="mc-body grid grid-cols-1 gap-6 p-6 sm:grid-cols-[auto_1fr]">
-        {/* Colonne gauche : photo + badge maillot */}
-        <div className="flex justify-center sm:block">
-          <div className="relative h-32 w-32 flex-shrink-0">
-            <div className="mc-photo flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border-4 border-gold/40 bg-royal-dark">
+      {/* ===== Corps : photo circulaire + identité + grille d'attributs ===== */}
+      <div className="mc-body relative z-10 flex flex-col items-center gap-5 px-6 pt-7 pb-6">
+        {/* Photo circulaire à double bordure or + bleu royal, badge maillot */}
+        <div className="relative h-36 w-36">
+          <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-4 border-gold bg-white">
+            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-4 border-royal">
               {member.photo_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -132,155 +257,137 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <span className="text-3xl font-bold text-gold-light">
+                <span className="text-3xl font-black text-royal">
                   {getInitials(member)}
                 </span>
               )}
             </div>
-            {member.shirt_number != null && (
-              <div className="absolute -bottom-2 -right-2 flex h-12 w-12 items-center justify-center rounded-full border-4 border-midnight-light bg-gold font-black text-xl text-midnight shadow-lg">
-                {member.shirt_number}
-              </div>
-            )}
           </div>
+          {member.shirt_number != null && (
+            <div className="absolute -bottom-1 -right-1 flex h-12 w-12 items-center justify-center rounded-full border-4 border-white bg-gold font-black text-xl text-midnight shadow-lg">
+              {member.shirt_number}
+            </div>
+          )}
         </div>
 
-        {/* Colonne droite : identité + stats */}
-        <div className="flex flex-col justify-center gap-4">
-          <div className="text-center sm:text-left">
-            <h2 className="text-2xl font-black text-white sm:text-3xl">
-              {fullName(member)}
-            </h2>
-            <p className="mt-1 text-sm font-medium uppercase tracking-wide text-gold-light">
-              {member.role} · {member.category}
-            </p>
-          </div>
+        {/* Nom + rôle */}
+        <div className="text-center">
+          <h2 className="text-2xl font-black uppercase tracking-wide text-midnight sm:text-3xl">
+            {fullName(member)}
+          </h2>
+          <p className="mt-1 text-sm font-bold uppercase tracking-[0.15em] text-royal">
+            {member.role}
+            {member.category ? ` | ${member.category}` : ""}
+          </p>
+        </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <StatTile icon={Target} label="Poste" value={member.position ?? "—"} />
-            <StatTile
-              icon={Hash}
-              label="Maillot"
-              value={
-                member.shirt_number != null ? `№ ${member.shirt_number}` : "—"
-              }
-            />
-            <StatTile
-              icon={Ruler}
-              label="Taille"
-              value={formatHeight(member.height_cm)}
-            />
-            <StatTile
-              icon={Scale}
-              label="Poids"
-              value={formatWeight(member.weight_kg)}
-            />
-          </div>
+        {/* Grille d'attributs 2×2 */}
+        <div className="grid w-full grid-cols-2 gap-3">
+          <StatTile icon={Target} label="Poste" value={member.position ?? "—"} />
+          <StatTile
+            icon={Hash}
+            label="Maillot"
+            value={
+              member.shirt_number != null ? `N° ${member.shirt_number}` : "—"
+            }
+          />
+          <StatTile
+            icon={Ruler}
+            label="Taille"
+            value={formatHeight(member.height_cm)}
+          />
+          <StatTile
+            icon={Scale}
+            label="Poids"
+            value={formatWeight(member.weight_kg)}
+          />
         </div>
       </div>
 
-      {/* ===== Bas : QR + statut + actions ===== */}
-      <div className="mc-foot flex flex-col items-center gap-4 border-t border-white/10 px-6 py-5 sm:flex-row sm:items-stretch">
-        {/* QR code */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="mc-qr rounded-xl border border-white/10 bg-white p-2">
+      {/* ===== Validation : QR + statut + licence ===== */}
+      <div className="mc-foot relative z-10 flex items-center gap-4 border-t border-gold/30 px-6 py-5">
+        {/* QR */}
+        <div className="flex flex-col items-center gap-1.5">
+          <div className="mc-qr rounded-2xl border-2 border-gold bg-white p-1.5">
             {loadingQr ? (
-              <div className="flex h-[88px] w-[88px] items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-slate-400" />
+              <div className="flex h-[76px] w-[76px] items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-royal" />
               </div>
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={qrDataUrl}
                 alt={`QR code de la licence ${member.id}`}
-                width={88}
-                height={88}
-                className="h-[88px] w-[88px]"
+                width={76}
+                height={76}
+                className="h-[76px] w-[76px]"
               />
             )}
           </div>
-          <p className="max-w-[88px] text-center text-[10px] leading-tight text-slate-500">
-            Scanner pour vérifier
+          <p className="max-w-[84px] text-center text-[9px] font-semibold uppercase leading-tight tracking-wider text-royal">
+            Scannez pour vérifier le statut
           </p>
         </div>
 
         {/* Statut + licence */}
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 sm:items-start">
+        <div className="flex flex-1 flex-col items-center gap-2 sm:items-start">
           {isActive ? (
-            <div className="mc-status-active flex items-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-4 py-2.5">
-              <ShieldCheck className="h-5 w-5 flex-shrink-0 text-emerald-400" />
-              <span className="text-sm font-semibold uppercase tracking-wide text-emerald-400">
+            <div className="mc-status-active flex items-center gap-2 rounded-xl border-2 border-emerald-500 bg-gradient-to-br from-emerald-400 to-emerald-600 px-3.5 py-2.5 shadow-md">
+              <ShieldCheck className="h-5 w-5 flex-shrink-0 text-white" />
+              <span className="text-sm font-black uppercase tracking-wide text-white">
                 ✓ Licence valide
               </span>
             </div>
           ) : (
-            <div className="mc-status-inactive flex items-center gap-2 rounded-xl border border-red-500/40 bg-red-500/15 px-4 py-2.5">
-              <ShieldAlert className="h-5 w-5 flex-shrink-0 text-red-400" />
-              <span className="text-sm font-semibold uppercase tracking-wide text-red-400">
+            <div className="mc-status-inactive flex items-center gap-2 rounded-xl border-2 border-red-500 bg-gradient-to-br from-red-400 to-red-600 px-3.5 py-2.5 shadow-md">
+              <ShieldAlert className="h-5 w-5 flex-shrink-0 text-white" />
+              <span className="text-sm font-black uppercase tracking-wide text-white">
                 ✗ Licence inactive
               </span>
             </div>
           )}
-          <p className="mc-licence font-mono text-xs text-slate-400">
-            Licence&nbsp;: <span className="text-gold-light">WB-{member.id}</span>
+          <p className="mc-licence font-mono text-xs font-semibold text-slate-600">
+            Licence&nbsp;:{" "}
+            <span className="text-gold-dark">WB-{member.id}</span>
           </p>
-        </div>
-
-        {/* Actions — masquées à l'impression */}
-        <div className="no-print flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-          <button
-            onClick={handlePrint}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-royal px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-royal-light sm:flex-none"
-          >
-            <Printer className="h-4 w-4" />
-            Imprimer
-          </button>
-          <button
-            onClick={handleDownloadQr}
-            disabled={!qrDataUrl}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-gold/40 px-4 py-2.5 text-sm font-semibold text-gold-light transition hover:bg-gold hover:text-midnight disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none"
-          >
-            <Download className="h-4 w-4" />
-            QR
-          </button>
         </div>
       </div>
 
+      {/* ===== Pied de carte : mentions légales ===== */}
+      <footer className="relative z-10 border-t-2 border-gold bg-royal-dark/5 px-5 py-3 text-center">
+        <p className="text-[9px] font-semibold uppercase leading-snug tracking-wider text-royal">
+          Carte officielle de Waraba Basket{" "}
+          <span className="text-gold-dark">|</span> Valide pour la saison en
+          cours — Bluezone de Dixinn, Conakry{" "}
+          <span className="text-gold-dark">|</span> Toute reproduction interdite
+        </p>
+      </footer>
+
       {/* URL absolue encodée dans le QR (info, masquée à l'impression) */}
       {memberUrl && (
-        <p className="no-print px-6 pb-4 text-center text-[11px] text-slate-600">
+        <p className="no-print relative z-10 px-6 pb-4 text-center text-[11px] text-slate-500">
           {memberUrl}
         </p>
       )}
 
-      {/* Pied de carte officiel — visible uniquement à l'impression */}
-      <div className="print-only border-t border-slate-200 px-6 py-3 text-center text-[11px] uppercase tracking-wider text-slate-500">
-        Carte officielle Waraba Basket — vérifiez l&apos;authenticité en
-        scannant le QR code
+      {/* ===== Actions écran (masquées à l'impression) ===== */}
+      <div className="no-print relative z-10 flex gap-3 px-6 pb-6">
+        <button
+          onClick={handlePrint}
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-royal px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-royal-light"
+        >
+          <Printer className="h-4 w-4" />
+          Imprimer
+        </button>
+        <button
+          onClick={handleDownloadQr}
+          disabled={!qrDataUrl}
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-gold/60 px-4 py-2.5 text-sm font-semibold text-gold-dark transition hover:bg-gold hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Download className="h-4 w-4" />
+          QR
+        </button>
       </div>
     </article>
-  );
-}
-
-/** Tuile de stat : icône + label + valeur. */
-function StatTile({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="mc-tile flex items-center gap-3 rounded-xl border border-white/10 bg-midnight px-3 py-2.5">
-      <Icon className="h-5 w-5 flex-shrink-0 text-gold-light" />
-      <div className="min-w-0">
-        <p className="text-[10px] uppercase tracking-wide text-slate-500">
-          {label}
-        </p>
-        <p className="truncate text-sm font-semibold text-white">{value}</p>
-      </div>
-    </div>
   );
 }
