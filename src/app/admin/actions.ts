@@ -16,6 +16,10 @@ import {
   deleteMemberPhoto,
   type MemberInput,
 } from "@/lib/members-data";
+import {
+  insertContactMessage,
+  markContactMessageRead,
+} from "@/lib/contact-data";
 import type { MemberStatus } from "@/types/member";
 
 /**
@@ -286,4 +290,61 @@ export async function deleteMemberAction(
   revalidatePath(`/member/${id}`);
 
   return { ok: true, name };
+}
+
+// ---- Messages de contact (formulaire public) ----
+
+export type ContactState = { ok?: boolean; error?: string };
+
+export type ContactReadState = { ok?: boolean; error?: string; id?: string };
+
+/** Validation basique d'un email. */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Soumission du formulaire de contact public. Aucune auth requise (le
+ * formulaire est public) : on valide côté serveur et on insère via le client
+ * service role (RLS contournée côté serveur uniquement).
+ */
+export async function sendContactMessageAction(
+  _prev: ContactState,
+  formData: FormData
+): Promise<ContactState> {
+  const name = str(formData.get("name"));
+  const email = str(formData.get("email"));
+  const message = str(formData.get("message"));
+
+  if (!name || name.length > 100) {
+    return { error: "Veuillez indiquer votre nom (100 caractères max)." };
+  }
+  if (!email || !EMAIL_RE.test(email) || email.length > 200) {
+    return { error: "Veuillez indiquer un email valide." };
+  }
+  if (!message || message.length < 5 || message.length > 2000) {
+    return {
+      error: "Votre message doit contenir entre 5 et 2000 caractères.",
+    };
+  }
+
+  const result = await insertContactMessage({ name, email, message });
+  if ("error" in result) {
+    return { error: result.error };
+  }
+  return { ok: true };
+}
+
+/** Marque un message comme lu (admin). */
+export async function markContactReadAction(
+  _prev: ContactReadState,
+  formData: FormData
+): Promise<ContactReadState> {
+  if (!(await isAdmin())) {
+    return { error: "Non autorisé. Veuillez vous reconnecter." };
+  }
+  const id = str(formData.get("id"));
+  if (!id) return { error: "Message introuvable." };
+  const result = await markContactMessageRead(id);
+  if ("error" in result) return { error: result.error };
+  revalidatePath("/admin/messages");
+  return { ok: true, id };
 }

@@ -11,8 +11,17 @@ import {
   ChevronDown,
   Images,
   Star,
+  Mail,
+  Send,
 } from "lucide-react";
-import { LionMark, LionWatermark, SectionHeader } from "@/components/brand";
+import {
+  LionMark,
+  LionWatermark,
+  SectionHeader,
+  WhatsAppIcon,
+} from "@/components/brand";
+import ContactForm from "@/components/ContactForm";
+import { WHATSAPP_URL, WHATSAPP_DISPLAY } from "@/lib/contact";
 
 /* ============================================================
    Waraba Basket — Page d'accueil (Premium Sports / VIP)
@@ -353,6 +362,69 @@ export default function Home() {
             >
               Découvrir l&apos;effectif
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== CONTACT ===== */}
+      <section
+        id="contact"
+        className="mx-auto w-full max-w-5xl px-6 py-20"
+      >
+        <SectionHeader
+          icon={Mail}
+          title="Contact"
+          subtitle="Une question, une envie de rejoindre le club ou un message à passer ? Écrivez-nous ou contactez-nous directement sur WhatsApp."
+          className="mb-8"
+        />
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Colonne gauche : WhatsApp + infos */}
+          <div className="relative flex flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-amber-500/50 bg-blue-900 p-7">
+            <LionWatermark tone="gold" />
+            <div className="relative z-10">
+              <h3 className="text-lg font-bold text-white">
+                Discutons en direct
+              </h3>
+              <p className="mt-1 text-sm text-slate-300">
+                Le moyen le plus rapide de nous joindre : un message WhatsApp
+                et nous vous répondons.
+              </p>
+            </div>
+
+            {/* Bouton WhatsApp (vert marque) */}
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative z-10 inline-flex items-center justify-center gap-3 rounded-2xl bg-[#25D366] px-6 py-4 font-bold text-[#06281e] shadow-lg shadow-[#25D366]/30 transition hover:bg-[#1ebe5d]"
+            >
+              <WhatsAppIcon className="h-7 w-7" />
+              Écrire sur WhatsApp
+            </a>
+
+            <div className="relative z-10 space-y-2 text-sm text-slate-300">
+              <p className="flex items-center gap-2">
+                <WhatsAppIcon className="h-4 w-4 text-[#25D366]" />
+                {WHATSAPP_DISPLAY}
+              </p>
+              <p className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-amber-400" />
+                Bluezone de Dixinn, Conakry
+              </p>
+            </div>
+          </div>
+
+          {/* Colonne droite : formulaire */}
+          <div className="relative overflow-hidden rounded-3xl border border-amber-500/50 bg-blue-900 p-7">
+            <LionWatermark tone="gold" />
+            <div className="relative z-10">
+              <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-white">
+                <Send className="h-5 w-5 text-amber-400" />
+                Envoyez un message
+              </h3>
+              <ContactForm />
+            </div>
           </div>
         </div>
       </section>
