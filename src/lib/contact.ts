@@ -4,11 +4,11 @@
  * reflète partout (section contact + bouton flottant).
  */
 
-/** Numéro WhatsApp au format wa.me (sans + ni espaces) : +224 626 62 19 86 */
-export const WHATSAPP_NUMBER = "224626621986";
+/** Numéro WhatsApp au format wa.me (sans + ni espaces) : +224 610 25 52 49 */
+export const WHATSAPP_NUMBER = "224610255249";
 
 /** Numéro affiché à l'utilisateur. */
-export const WHATSAPP_DISPLAY = "+224 626 62 19 86";
+export const WHATSAPP_DISPLAY = "+224 610 25 52 49";
 
 /** Message pré-rempli quand on ouvre WhatsApp depuis le site. */
 export const WHATSAPP_PREFILL =
