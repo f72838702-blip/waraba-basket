@@ -175,7 +175,7 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
         setQrDataUrl(url);
         setMemberUrl(absoluteUrl);
       })
-      .catch((err) => console.error("[Waraba Basket] QR error:", err))
+      .catch((err) => console.error("[Matam Waraba] QR error:", err))
       .finally(() => {
         if (active) setLoadingQr(false);
       });
@@ -192,7 +192,7 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
     if (!qrDataUrl) return;
     const link = document.createElement("a");
     link.href = qrDataUrl;
-    link.download = `waraba-basket-licence-${member.id}.png`;
+    link.download = `matam-waraba-licence-${member.id}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -208,10 +208,10 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
           <LionMark className="h-9 w-9 text-gold" faceColor="#172554" />
           <div className="leading-tight">
             <p className="text-base font-black uppercase tracking-wider text-gold sm:text-lg">
-              Waraba Basket
+              Matam Waraba
             </p>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/80">
-              Club de Basketball
+              Basketball Academy
             </p>
           </div>
         </div>
@@ -348,7 +348,7 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
           )}
           <p className="mc-licence font-mono text-xs font-semibold text-slate-600">
             Licence&nbsp;:{" "}
-            <span className="text-gold-dark">WB-{member.id}</span>
+            <span className="text-gold-dark">MW-{member.id}</span>
           </p>
         </div>
       </div>
@@ -356,7 +356,7 @@ export default function MemberCard({ member, canEdit }: MemberCardProps) {
       {/* ===== Pied de carte : mentions légales ===== */}
       <footer className="relative z-10 border-t-2 border-gold bg-royal-dark/5 px-5 py-3 text-center">
         <p className="text-[9px] font-semibold uppercase leading-snug tracking-wider text-royal">
-          Carte officielle de Waraba Basket{" "}
+          Carte officielle de Matam Waraba{" "}
           <span className="text-gold-dark">|</span> Valide pour la saison en
           cours — Bluezone de Dixinn, Conakry{" "}
           <span className="text-gold-dark">|</span> Toute reproduction interdite

@@ -67,7 +67,7 @@ export async function insertContactMessage(
     });
 
   if (error) {
-    console.error("[Waraba Basket] insertContactMessage:", error.message);
+    console.error("[Matam Waraba] insertContactMessage:", error.message);
     return {
       error:
         "Impossible d'enregistrer votre message pour le moment. Réessayez plus tard.",
@@ -85,7 +85,7 @@ export async function getContactMessages(): Promise<ContactMessage[]> {
     .select("*")
     .order("created_at", { ascending: false });
   if (error || !data) {
-    console.error("[Waraba Basket] getContactMessages:", error?.message);
+    console.error("[Matam Waraba] getContactMessages:", error?.message);
     return [];
   }
   return (data as ContactRow[]).map(toContactMessage);

@@ -47,7 +47,7 @@ export const getAllMembers = cache(async (): Promise<Member[]> => {
   if (!isSupabaseConfigured) {
     if (process.env.NODE_ENV !== "production") {
       console.warn(
-        "[Waraba Basket] Supabase non configuré — getAllMembers utilise les données démo."
+        "[Matam Waraba] Supabase non configuré — getAllMembers utilise les données démo."
       );
     }
     return DEMO_MEMBERS;
@@ -59,7 +59,7 @@ export const getAllMembers = cache(async (): Promise<Member[]> => {
     .order("full_name");
 
   if (error) {
-    console.warn("[Waraba Basket] getAllMembers: erreur Supabase —", error.message);
+    console.warn("[Matam Waraba] getAllMembers: erreur Supabase —", error.message);
     return [];
   }
 
@@ -78,7 +78,7 @@ export const getMemberById = cache(async (id: string): Promise<Member | undefine
     .maybeSingle();
 
   if (error) {
-    console.warn("[Waraba Basket] getMemberById: erreur Supabase —", error.message);
+    console.warn("[Matam Waraba] getMemberById: erreur Supabase —", error.message);
     return undefined;
   }
 
@@ -139,7 +139,7 @@ export async function insertMember(
     .single();
 
   if (error) {
-    console.warn("[Waraba Basket] insertMember: erreur Supabase —", error.message);
+    console.warn("[Matam Waraba] insertMember: erreur Supabase —", error.message);
     return { error: error.message };
   }
 
@@ -190,7 +190,7 @@ export async function uploadMemberPhoto(
     .upload(path, arrayBuffer, { contentType: mime, upsert: false });
 
   if (error) {
-    console.warn("[Waraba Basket] uploadMemberPhoto: erreur —", error.message);
+    console.warn("[Matam Waraba] uploadMemberPhoto: erreur —", error.message);
     return { error: error.message };
   }
 
@@ -236,7 +236,7 @@ export async function deleteMemberPhoto(url: string | null): Promise<void> {
     .remove([path]);
   if (error) {
     console.warn(
-      "[Waraba Basket] deleteMemberPhoto: suppression Storage ignorée —",
+      "[Matam Waraba] deleteMemberPhoto: suppression Storage ignorée —",
       error.message
     );
   }
@@ -276,7 +276,7 @@ export async function updateMember(
     .eq("id", id);
 
   if (error) {
-    console.warn("[Waraba Basket] updateMember: erreur Supabase —", error.message);
+    console.warn("[Matam Waraba] updateMember: erreur Supabase —", error.message);
     return { error: error.message };
   }
 
@@ -303,7 +303,7 @@ export async function deleteMember(
     .maybeSingle();
   if (feErr) {
     console.warn(
-      "[Waraba Basket] deleteMember: erreur lecture photo —",
+      "[Matam Waraba] deleteMember: erreur lecture photo —",
       feErr.message
     );
   }
@@ -315,7 +315,7 @@ export async function deleteMember(
   // 3) Suppression de la ligne.
   const { error } = await supabaseServer.from("members").delete().eq("id", id);
   if (error) {
-    console.warn("[Waraba Basket] deleteMember: erreur Supabase —", error.message);
+    console.warn("[Matam Waraba] deleteMember: erreur Supabase —", error.message);
     return { error: error.message };
   }
 

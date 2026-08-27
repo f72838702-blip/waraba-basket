@@ -19,9 +19,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   const member = await getMemberById(id);
-  if (!member) return { title: "Membre introuvable — Admin Waraba Basket" };
+  if (!member) return { title: "Membre introuvable — Admin Matam Waraba" };
   return {
-    title: `Modifier ${fullName(member)} — Admin Waraba Basket`,
+    title: `Modifier ${fullName(member)} — Admin Matam Waraba`,
   };
 }
 

@@ -1,5 +1,5 @@
 /**
- * Entité Membre du club Waraba Basket.
+ * Entité Membre de la Matam Waraba Basketball Academy.
  * Reflète la table `members` côté Supabase (migration-player-fields.sql).
  */
 

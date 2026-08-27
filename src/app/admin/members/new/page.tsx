@@ -5,7 +5,7 @@ import { isAdmin } from "@/lib/auth";
 import CreateMemberForm from "@/components/admin/CreateMemberForm";
 
 export const metadata = {
-  title: "Nouvelle fiche membre — Admin Waraba Basket",
+  title: "Nouvelle fiche membre — Admin Matam Waraba",
 };
 
 /**

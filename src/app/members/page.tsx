@@ -5,9 +5,9 @@ import { getAllMembers } from "@/lib/members-data";
 import { fullName, getInitials } from "@/lib/members";
 
 export const metadata: Metadata = {
-  title: "Effectif — Waraba Basket",
+  title: "Effectif — Matam Waraba",
   description:
-    "Annuaire des membres et joueurs du club Waraba Basket : joueurs, entraîneurs et dirigeants.",
+    "Annuaire des membres et joueurs de la Matam Waraba Basketball Academy : joueurs, entraîneurs et dirigeants.",
 };
 
 /**
@@ -32,7 +32,7 @@ export default async function MembersPage() {
       <header className="mb-10">
         <h1 className="flex items-center gap-3 text-3xl font-black text-white sm:text-4xl">
           <Users className="h-8 w-8 text-gold-light" />
-          Effectif Waraba Basket
+          Effectif Matam Waraba
         </h1>
         <p className="mt-2 text-slate-400">
           {members.length} membre{members.length > 1 ? "s" : ""} du club —

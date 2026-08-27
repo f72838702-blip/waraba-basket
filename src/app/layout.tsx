@@ -23,9 +23,9 @@ const script = Dancing_Script({
 });
 
 export const metadata: Metadata = {
-  title: "Waraba Basket — Club de Basketball",
+  title: "Matam Waraba — Basketball Academy",
   description:
-    "Site officiel du club Waraba Basket : actualités, effectif, calendrier et billetterie.",
+    "Site officiel de la Matam Waraba Basketball Academy : actualités, effectif, calendrier et billetterie.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           href={WHATSAPP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Contacter Waraba Basket sur WhatsApp"
+          aria-label="Contacter Matam Waraba sur WhatsApp"
           className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-[#06281e] shadow-lg shadow-[#25D366]/40 transition hover:scale-110 hover:bg-[#1ebe5d] print:hidden"
         >
           <WhatsAppIcon className="h-7 w-7" />

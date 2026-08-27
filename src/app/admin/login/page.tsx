@@ -3,7 +3,7 @@ import { isAdmin } from "@/lib/auth";
 import LoginForm from "@/components/admin/LoginForm";
 
 export const metadata = {
-  title: "Connexion admin — Waraba Basket",
+  title: "Connexion admin — Matam Waraba",
 };
 
 /**
@@ -19,7 +19,7 @@ export default async function AdminLoginPage() {
     <div className="flex flex-1 items-center justify-center px-6 py-16">
       <div className="w-full max-w-sm">
         <h1 className="mb-6 text-center text-2xl font-black text-white">
-          🏀 Waraba Basket
+          🏀 Matam Waraba
         </h1>
         <LoginForm />
         <p className="mt-6 text-center text-xs text-slate-600">

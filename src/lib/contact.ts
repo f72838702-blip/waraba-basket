@@ -12,7 +12,7 @@ export const WHATSAPP_DISPLAY = "+224 610 25 52 49";
 
 /** Message pré-rempli quand on ouvre WhatsApp depuis le site. */
 export const WHATSAPP_PREFILL =
-  "Bonjour Waraba Basket, je vous contacte depuis votre site web.";
+  "Bonjour Matam Waraba, je vous contacte depuis votre site web.";
 
 /** URL wa.me complète avec message pré-rempli. */
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(

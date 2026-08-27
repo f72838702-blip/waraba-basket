@@ -4,7 +4,7 @@ import { logoutAction } from "./actions";
 import LogoutButton from "@/components/admin/LogoutButton";
 
 /**
- * Layout du back-office admin. Bandeau sobre « Waraba Basket — Admin » avec
+ * Layout du back-office admin. Bandeau sobre « Matam Waraba — Admin » avec
  * déconnexion, affiché uniquement si l'admin est authentifié (masqué sur
  * l'écran de login). La lecture du cookie force le rendu dynamique de /admin.
  */
@@ -25,7 +25,7 @@ export default async function AdminLayout({
                 🏀
               </span>
               <span className="text-sm font-bold uppercase tracking-wider text-gold-light">
-                Waraba Basket — Admin
+                Matam Waraba — Admin
               </span>
             </div>
             <div className="flex items-center gap-4">

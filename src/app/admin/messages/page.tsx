@@ -5,7 +5,7 @@ import { getContactMessages } from "@/lib/contact-data";
 import MarkReadButton from "@/components/admin/MarkReadButton";
 
 export const metadata = {
-  title: "Messages — Admin Waraba Basket",
+  title: "Messages — Admin Matam Waraba",
 };
 
 /**

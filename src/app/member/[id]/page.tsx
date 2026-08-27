@@ -8,7 +8,7 @@ import { isAdmin } from "@/lib/auth";
 import MemberCard from "@/components/MemberCard";
 
 /**
- * Carte de membre officielle — Waraba Basket.
+ * Carte de membre officielle — Matam Waraba.
  * Route : /member/[id]
  *
  * La lecture du cookie admin (`isAdmin()`) rend la route dynamique : un
@@ -20,7 +20,7 @@ export async function generateMetadata({
 }: PageProps<"/member/[id]">): Promise<Metadata> {
   const { id } = await params;
   const member = await getMemberById(id);
-  if (!member) return { title: "Membre introuvable — Waraba Basket" };
+  if (!member) return { title: "Membre introuvable — Matam Waraba" };
   const name = fullName(member);
   return {
     title: `${name} — Carte de membre`,

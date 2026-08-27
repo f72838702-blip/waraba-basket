@@ -11,7 +11,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   // On évite un crash en dev tant que les variables ne sont pas renseignées.
   if (process.env.NODE_ENV !== "production") {
     console.warn(
-      "[Waraba Basket] Variables Supabase manquantes : renseignez NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY dans .env.local"
+      "[Matam Waraba] Variables Supabase manquantes : renseignez NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY dans .env.local"
     );
   }
 }

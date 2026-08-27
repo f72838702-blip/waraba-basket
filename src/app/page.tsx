@@ -24,7 +24,7 @@ import ContactForm from "@/components/ContactForm";
 import { WHATSAPP_URL, WHATSAPP_DISPLAY } from "@/lib/contact";
 
 /* ============================================================
-   Waraba Basket — Page d'accueil (Premium Sports / VIP)
+   Matam Waraba — Page d'accueil (Premium Sports / VIP)
    Palette : Bleu Royal (#1E3A8A) · Or (#F59E0B) · Blanc
    Mobile-first, Tailwind CSS, icônes Lucide-react.
    ============================================================ */
@@ -43,7 +43,7 @@ const news = [
     tag: "Match",
     title: "Victoire serrée contre les Eagles",
     excerpt:
-      "Waraba s'impose 78-75 après prolongation grâce à un panier au buzzer.",
+      "Matam Waraba s'impose 78-75 après prolongation grâce à un panier au buzzer.",
     date: "12 août 2026",
   },
   {
@@ -105,10 +105,10 @@ export default function Home() {
         <div className="relative z-10 mx-auto w-full max-w-5xl px-6 text-center">
           <span className="animate-fade-up mb-6 inline-flex items-center gap-2 rounded-full border border-amber-500/50 bg-blue-950/50 px-4 py-1.5 text-sm font-medium text-amber-400 backdrop-blur">
             <Star className="h-4 w-4 fill-amber-400" />
-            Club de Basketball • Saison 2026-2027
+            Basketball Academy • Saison 2026-2027
           </span>
           <h1 className="animate-fade-up bg-gradient-to-r from-white via-amber-300 to-white bg-clip-text text-6xl font-black tracking-tight text-transparent drop-shadow-2xl sm:text-8xl">
-            Waraba Basket
+            Matam Waraba
           </h1>
           <p className="animate-fade-up mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-200 sm:text-xl">
             La fierté sur le parquet. Vivez le basket intensément — matchs,
@@ -189,7 +189,7 @@ export default function Home() {
           <div className="relative h-72">
             <Image
               src="/images/action-2.jpg"
-              alt="Action de match Waraba Basket"
+              alt="Action de match Matam Waraba"
               fill
               sizes="(max-width: 768px) 100vw, 30rem"
               className="object-cover"
@@ -210,7 +210,7 @@ export default function Home() {
           <div className="relative z-10 px-6 pt-12 pb-7">
             {/* Affiche : équipe vs équipe, le « vs » en script or */}
             <h3 className="text-center text-2xl font-black uppercase tracking-wide text-white sm:text-3xl">
-              Waraba Basket{" "}
+              Matam Waraba{" "}
               <span
                 style={scriptStyle}
                 className="mx-1 inline-block text-amber-400 [transform:rotate(-6deg)]"
@@ -327,11 +327,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ===== CTA — Rejoignez la famille Waraba ===== */}
+      {/* ===== CTA — Rejoignez la famille Matam Waraba ===== */}
       <section className="relative overflow-hidden">
         <Image
           src="/images/team.jpg"
-          alt="L'équipe Waraba Basket"
+          alt="L'équipe Matam Waraba"
           fill
           sizes="100vw"
           className="object-cover"
@@ -341,7 +341,7 @@ export default function Home() {
 
         <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-start gap-5 px-6 py-24">
           <h2 className="max-w-xl text-4xl font-black text-white sm:text-5xl">
-            Rejoignez la famille Waraba
+            Rejoignez la famille Matam Waraba
           </h2>
           <p className="max-w-lg text-lg text-slate-200">
             Que vous soyez joueur, bénévole ou supporter, il y a une place pour
@@ -436,16 +436,16 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <LionMark className="h-8 w-8 text-amber-400" faceColor="#172554" />
             <span className="text-lg font-black text-amber-400">
-              Waraba Basket
+              Matam Waraba
             </span>
           </div>
           {/* Séparateur doré fin */}
           <div className="h-px w-24 bg-amber-500/40" />
           <p className="text-sm text-slate-400">
-            © {new Date().getFullYear()} Waraba Basket. Tous droits réservés.
+            © {new Date().getFullYear()} Matam Waraba. Tous droits réservés.
           </p>
           <p className="text-xs text-slate-500">
-            Bluezone de Dixinn, Conakry • Club de Basketball
+            Bluezone de Dixinn, Conakry • Basketball Academy
           </p>
         </div>
       </footer>

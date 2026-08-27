@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 
 /* ============================================================
-   Waraba Basket — composants de marque réutilisables
+   Matam Waraba — composants de marque réutilisables
    Emblème du club : le lion (waraba = lion en bambara/jula).
    Couleurs : Bleu Royal (#1E3A8A) / Or (#F59E0B) / Blanc.
    ============================================================ */

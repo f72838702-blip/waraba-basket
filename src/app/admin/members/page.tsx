@@ -7,7 +7,7 @@ import { fullName, getInitials } from "@/lib/members";
 import DeleteMemberButton from "@/components/admin/DeleteMemberButton";
 
 export const metadata = {
-  title: "Membres — Admin Waraba Basket",
+  title: "Membres — Admin Matam Waraba",
 };
 
 /**
