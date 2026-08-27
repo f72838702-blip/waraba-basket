@@ -20,7 +20,14 @@ import {
   insertContactMessage,
   markContactMessageRead,
 } from "@/lib/contact-data";
+import {
+  insertPost,
+  updatePost,
+  deletePost,
+  type PostInput,
+} from "@/lib/posts-data";
 import type { MemberStatus } from "@/types/member";
+import { POST_CATEGORIES, type PostCategory } from "@/types/post";
 
 /**
  * Server Actions du back-office admin.
@@ -351,4 +358,156 @@ export async function markContactReadAction(
   if ("error" in result) return { error: result.error };
   revalidatePath("/admin/messages");
   return { ok: true, id };
+}
+
+// ---- Articles (accueil dynamique : matchs, actualités, partenariats…) ----
+
+export type PostState = {
+  ok?: boolean;
+  error?: string;
+  /** UUID de l'article créé/modifié. */
+  id?: string;
+  /** Titre d'affichage (retour UI). */
+  title?: string;
+};
+
+const POST_CATEGORY_VALUES = POST_CATEGORIES.map((c) => c.value);
+
+/** Date ISO yyyy-mm-dd attendue ; vide/invalide → null. */
+function parseDate(raw: FormDataEntryValue | null): string | null {
+  const s = str(raw);
+  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : null;
+}
+
+/** Champs scalaires communs create/edit (hors image). */
+function parsePostScalars(formData: FormData): {
+  input: Omit<PostInput, "image_url">;
+  error?: string;
+} {
+  const title = str(formData.get("title"));
+  const excerpt = str(formData.get("excerpt"));
+  const contentRaw = str(formData.get("content"));
+
+  const categoryRaw = str(formData.get("category"));
+  const category = (
+    POST_CATEGORY_VALUES.includes(categoryRaw as PostCategory)
+      ? categoryRaw
+      : "actualite"
+  ) as PostCategory;
+
+  const input = {
+    title,
+    category,
+    excerpt,
+    content: contentRaw === "" ? null : contentRaw,
+    event_date: parseDate(formData.get("event_date")),
+    published: formData.get("published") === "on",
+  };
+
+  if (!title || title.length > 150) {
+    return { input, error: "Le titre est obligatoire (150 caractères max)." };
+  }
+  if (!excerpt || excerpt.length > 300) {
+    return {
+      input,
+      error: "Le résumé est obligatoire (300 caractères max).",
+    };
+  }
+  if (input.content && input.content.length > 5000) {
+    return { input, error: "Le texte dépasse 5000 caractères." };
+  }
+  return { input };
+}
+
+/** Résout l'image d'un article : fichier uploadé > URL saisie > existante. */
+async function resolvePostImage(
+  formData: FormData
+): Promise<{ image_url: string | null } | { error: string }> {
+  const existing = str(formData.get("current_image_url")) || null;
+  const file = formData.get("image_file");
+  const removeImage = str(formData.get("remove_image")) === "1";
+
+  if (file instanceof File && file.size > 0) {
+    const uploaded = await uploadMemberPhoto(file);
+    if ("error" in uploaded) return { error: `Image : ${uploaded.error}` };
+    await deleteMemberPhoto(existing);
+    return { image_url: uploaded.url };
+  }
+  if (removeImage) {
+    await deleteMemberPhoto(existing);
+    return { image_url: null };
+  }
+  const urlRaw = str(formData.get("image_url"));
+  if (urlRaw !== "") return { image_url: urlRaw };
+  return { image_url: existing };
+}
+
+/** Création d'un article depuis le back-office. */
+export async function createPostAction(
+  _prev: PostState,
+  formData: FormData
+): Promise<PostState> {
+  if (!(await isAdmin())) {
+    return { error: "Non autorisé. Veuillez vous reconnecter." };
+  }
+
+  const { input, error } = parsePostScalars(formData);
+  if (error) return { error };
+
+  const image = await resolvePostImage(formData);
+  if ("error" in image) return image;
+
+  const result = await insertPost({ ...input, image_url: image.image_url });
+  if ("error" in result) return { error: result.error };
+
+  revalidatePath("/");
+  revalidatePath("/admin/posts");
+  return { ok: true, id: result.id, title: input.title };
+}
+
+/** Édition d'un article (image : remplacer / retirer / conserver). */
+export async function updatePostAction(
+  _prev: PostState,
+  formData: FormData
+): Promise<PostState> {
+  if (!(await isAdmin())) {
+    return { error: "Non autorisé. Veuillez vous reconnecter." };
+  }
+
+  const id = str(formData.get("id"));
+  if (!id) return { error: "Article introuvable (identifiant manquant)." };
+
+  const { input, error } = parsePostScalars(formData);
+  if (error) return { error };
+
+  const image = await resolvePostImage(formData);
+  if ("error" in image) return image;
+
+  const result = await updatePost(id, { ...input, image_url: image.image_url });
+  if ("error" in result) return { error: result.error };
+
+  revalidatePath("/");
+  revalidatePath("/admin/posts");
+  return { ok: true, id, title: input.title };
+}
+
+/** Suppression d'un article (+ image Storage best-effort). */
+export async function deletePostAction(
+  _prev: PostState,
+  formData: FormData
+): Promise<PostState> {
+  if (!(await isAdmin())) {
+    return { error: "Non autorisé. Veuillez vous reconnecter." };
+  }
+
+  const id = str(formData.get("id"));
+  if (!id) return { error: "Article introuvable (identifiant manquant)." };
+  const title = str(formData.get("title")) || "cet article";
+
+  const result = await deletePost(id);
+  if ("error" in result) return { error: result.error };
+
+  revalidatePath("/");
+  revalidatePath("/admin/posts");
+  return { ok: true, title };
 }

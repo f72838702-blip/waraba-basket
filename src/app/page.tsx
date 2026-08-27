@@ -9,6 +9,8 @@ import {
   Mail,
   Send,
   MapPin,
+  Calendar,
+  Newspaper,
 } from "lucide-react";
 import {
   LionMark,
@@ -25,6 +27,8 @@ import {
   FACEBOOK_URL,
 } from "@/lib/contact";
 import { getAllMembers } from "@/lib/members-data";
+import { getPublishedPosts } from "@/lib/posts-data";
+import { categoryLabel, formatPostDate } from "@/types/post";
 
 /* ============================================================
    Matam Waraba — Page d'accueil (Académie de Basketball)
@@ -83,6 +87,15 @@ export const revalidate = 600;
 export default async function Home() {
   // Compteur membres dynamique = effectif réel en base (admin add/remove).
   const members = await getAllMembers();
+
+  // Articles publiés (admin → section « À la une », masquée si aucun).
+  const posts = await getPublishedPosts(6);
+  // Le prochain match (catégorie match, date future la plus proche) reçoit
+  // le badge spécial « Prochain match ».
+  const today = new Date().toISOString().slice(0, 10);
+  const nextMatch = posts
+    .filter((p) => p.category === "match" && p.event_date && p.event_date >= today)
+    .sort((a, b) => (a.event_date! < b.event_date! ? -1 : 1))[0];
 
   const stats = [
     { icon: Trophy, value: "5", label: "Catégories" },
@@ -314,6 +327,72 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* ===== À LA UNE — articles publiés depuis l'admin ===== */}
+      {posts.length > 0 && (
+        <section
+          id="actualites"
+          className="mx-auto w-full max-w-5xl px-6 py-20"
+        >
+          <SectionHeader
+            icon={Newspaper}
+            title="À la une"
+            subtitle="Matchs à venir, actualités et partenariats de l'académie."
+            className="mb-10"
+          />
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <article
+                key={post.id}
+                className="group relative flex flex-col overflow-hidden rounded-3xl border border-amber-500/50 bg-blue-900 transition hover:-translate-y-1 hover:border-amber-500"
+              >
+                <LionWatermark tone="gold" />
+
+                {/* Image ou fallback emblème */}
+                {post.image_url && (
+                  <div className="relative h-44 overflow-hidden">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={post.image_url}
+                      alt={post.title}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-blue-900 via-blue-900/30 to-transparent" />
+                  </div>
+                )}
+
+                {/* Badges catégorie + prochain match */}
+                <div className="absolute left-3 top-3 z-10 flex flex-wrap gap-2">
+                  <span className="rounded-full border border-amber-500/60 bg-blue-950/85 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-400 backdrop-blur">
+                    {categoryLabel(post.category)}
+                  </span>
+                  {nextMatch?.id === post.id && (
+                    <span className="rounded-full bg-amber-500 px-3 py-1 text-xs font-black uppercase tracking-wider text-blue-950">
+                      Prochain match
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative z-10 flex flex-1 flex-col p-5">
+                  <h3 className="text-lg font-bold leading-snug text-white">
+                    {post.title}
+                  </h3>
+                  <p className="mt-2 flex-1 text-sm leading-6 text-slate-300">
+                    {post.excerpt}
+                  </p>
+                  <p className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-400/90">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {post.event_date
+                      ? formatPostDate(post.event_date)
+                      : formatPostDate(post.created_at)}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ===== CTA — Rejoignez l'académie ===== */}
       <section className="relative overflow-hidden">

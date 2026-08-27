@@ -36,6 +36,12 @@ export default async function AdminLayout({
                 Membres
               </Link>
               <Link
+                href="/admin/posts"
+                className="text-sm text-slate-300 transition hover:text-gold-light"
+              >
+                Articles
+              </Link>
+              <Link
                 href="/admin/messages"
                 className="text-sm text-slate-300 transition hover:text-gold-light"
               >
