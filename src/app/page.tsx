@@ -9,13 +9,13 @@ import {
   Mail,
   Send,
   MapPin,
-  Facebook,
 } from "lucide-react";
 import {
   LionMark,
   LionWatermark,
   SectionHeader,
   WhatsAppIcon,
+  FacebookIcon,
 } from "@/components/brand";
 import ContactForm from "@/components/ContactForm";
 import {
@@ -399,7 +399,7 @@ export default async function Home() {
                 </a>
               </p>
               <p className="flex items-center gap-2">
-                <Facebook className="h-4 w-4 shrink-0 text-[#1877F2]" />
+                <FacebookIcon className="h-4 w-4 shrink-0 text-[#1877F2]" />
                 <a
                   href={FACEBOOK_URL}
                   target="_blank"
@@ -519,7 +519,7 @@ export default async function Home() {
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Facebook className="h-4 w-4 shrink-0 text-[#1877F2]" />
+                <FacebookIcon className="h-4 w-4 shrink-0 text-[#1877F2]" />
                 <a
                   href={FACEBOOK_URL}
                   target="_blank"
