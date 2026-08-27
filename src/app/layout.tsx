@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Dancing_Script } from "next/font/google";
 import "./globals.css";
 import { WhatsAppIcon } from "@/components/brand";
 import { WHATSAPP_URL } from "@/lib/contact";
+import PwaRegister from "@/components/PwaRegister";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +48,17 @@ export const metadata: Metadata = {
       "L'académie de basketball qui forme les talents de demain à Conakry — de l'initiation jusqu'à l'excellence sur le parquet.",
     images: [{ url: "/images/logo.jpg", width: 1440, height: 960 }],
   },
+  // PWA : installable, plein écran, titre iOS.
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Matam Waraba",
+  },
+};
+
+/** Barre d'adresse / statut teintée bleu royal (PWA standalone). */
+export const viewport: Viewport = {
+  themeColor: "#172554",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -56,6 +68,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} ${script.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-midnight text-foreground">
+        <PwaRegister />
         {children}
         {/* Bouton WhatsApp flottant — visible sur toutes les pages */}
         <a

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { isAdmin } from "@/lib/auth";
 import LoginForm from "@/components/admin/LoginForm";
+import InstallPrompt from "@/components/admin/InstallPrompt";
 
 export const metadata = {
   title: "Connexion admin — Matam Waraba",
@@ -25,6 +26,7 @@ export default async function AdminLoginPage() {
         <p className="mt-6 text-center text-xs text-slate-600">
           Accès réservé à l&apos;administration du club.
         </p>
+        <InstallPrompt />
       </div>
     </div>
   );
