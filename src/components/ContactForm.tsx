@@ -1,8 +1,35 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Send, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  Send,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  MessageCircle,
+} from "lucide-react";
 import { sendContactMessageAction } from "@/app/admin/actions";
+import { WHATSAPP_NUMBER } from "@/lib/contact";
+
+/** Compose un lien wa.me avec le contenu saisi (filet de sécurité si la
+    base est indisponible : le visiteur n'est jamais bloqué). */
+function openWhatsAppFallback() {
+  const val = (id: string) =>
+    (document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | null)
+      ?.value ?? "";
+  const text = [
+    "Bonjour Matam Waraba,",
+    `Nom : ${val("cf-name")}`,
+    `Email : ${val("cf-email")}`,
+    "",
+    val("cf-message"),
+  ].join("\n");
+  window.open(
+    `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
+}
 
 /**
  * Formulaire de contact public. Soumission via server action ; le message
@@ -45,10 +72,20 @@ export default function ContactForm() {
       {state?.error && (
         <div
           role="alert"
-          className="flex items-center gap-2 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+          className="flex flex-col gap-3 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3"
         >
-          <AlertCircle className="h-4 w-4 flex-shrink-0" />
-          {state.error}
+          <p className="flex items-center gap-2 text-sm text-red-300">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            {state.error}
+          </p>
+          <button
+            type="button"
+            onClick={openWhatsAppFallback}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] px-4 py-2.5 text-sm font-bold text-[#06281e] transition hover:bg-[#1ebe5d]"
+          >
+            <MessageCircle className="h-4 w-4" />
+            Transmettre via WhatsApp à la place
+          </button>
         </div>
       )}
 
