@@ -188,7 +188,9 @@ export async function createMemberAction(
     return { error: result.error };
   }
 
-  // L'annuaire public et la liste admin doivent refléter le nouveau membre.
+  // L'annuaire public, l'accueil (compteur membres) et la liste admin doivent
+  // refléter le nouveau membre.
+  revalidatePath("/");
   revalidatePath("/members");
   revalidatePath("/admin/members");
 
@@ -252,6 +254,7 @@ export async function updateMemberAction(
     return { error: result.error };
   }
 
+  revalidatePath("/");
   revalidatePath("/members");
   revalidatePath("/admin/members");
   revalidatePath(`/member/${id}`);
@@ -285,6 +288,7 @@ export async function deleteMemberAction(
     return { error: result.error };
   }
 
+  revalidatePath("/");
   revalidatePath("/members");
   revalidatePath("/admin/members");
   revalidatePath(`/member/${id}`);

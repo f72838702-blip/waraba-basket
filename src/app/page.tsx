@@ -22,6 +22,7 @@ import {
 } from "@/components/brand";
 import ContactForm from "@/components/ContactForm";
 import { WHATSAPP_URL, WHATSAPP_DISPLAY } from "@/lib/contact";
+import { getAllMembers } from "@/lib/members-data";
 
 /* ============================================================
    Matam Waraba — Page d'accueil (Premium Sports / VIP)
@@ -30,12 +31,8 @@ import { WHATSAPP_URL, WHATSAPP_DISPLAY } from "@/lib/contact";
    ============================================================ */
 
 // --- Données factices (à remplacer par du contenu réel plus tard) ---
-const stats = [
-  { icon: Trophy, value: "12", label: "Titres remportés" },
-  { icon: Users, value: "48", label: "Membres actifs" },
-  { icon: CalendarDays, value: "26", label: "Matchs cette saison" },
-  { icon: Flame, value: "15", label: "Ans d'existence" },
-];
+// NB : le nombre de « Membres » est dynamique (lus depuis Supabase) pour
+// refléter exactement l'effectif géré par l'admin — voir Home() ci-dessous.
 
 const news = [
   {
@@ -75,7 +72,22 @@ const gallery = [
 // Style manuscrit pour le « vs » du Prochain Match (Dancing Script).
 const scriptStyle = { fontFamily: "var(--font-script)" } as const;
 
-export default function Home() {
+// Régénère la page au plus toutes les 10 min en filet de sécurité ; les
+// actions admin (create/update/delete) forcent une régénération immédiate
+// via revalidatePath("/").
+export const revalidate = 600;
+
+export default async function Home() {
+  // Compteur membres dynamique = effectif réel en base (admin add/remove).
+  const members = await getAllMembers();
+
+  const stats = [
+    { icon: Trophy, value: "12", label: "Titres remportés" },
+    { icon: Users, value: String(members.length), label: "Membres" },
+    { icon: CalendarDays, value: "26", label: "Matchs cette saison" },
+    { icon: Flame, value: "15", label: "Ans d'existence" },
+  ];
+
   return (
     <main className="flex flex-1 flex-col bg-blue-950 text-slate-100">
       {/* ===== HERO ===== */}
