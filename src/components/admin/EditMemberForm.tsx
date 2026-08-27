@@ -48,53 +48,56 @@ export default function EditMemberForm({ member }: { member: Member }) {
     initialState
   );
 
+  // Deux inputs séparés pour fiabiliser la caméra sur mobile (cf. CreateMemberForm).
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [photoMode, setPhotoMode] = useState<PhotoMode>("current");
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoSize, setPhotoSize] = useState<number | null>(null);
   const [compressing, setCompressing] = useState(false);
 
-  // Ouvre le sélecteur : `capture` force la caméra arrière sur mobile.
+  // Ouvre la caméra (useCamera=true) ou le sélecteur de fichiers.
   function pickPhoto(useCamera: boolean) {
-    const el = fileInputRef.current;
+    const el = useCamera ? cameraInputRef.current : fileInputRef.current;
     if (!el) return;
-    if (useCamera) {
-      el.setAttribute("capture", "environment");
-    } else {
-      el.removeAttribute("capture");
-    }
+    el.value = "";
     el.click();
   }
 
   async function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const input = e.target;
-    const file = input.files?.[0];
+    const sourceInput = e.target;
+    const file = sourceInput.files?.[0];
     if (!file) return;
 
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     setCompressing(true);
     try {
       const compressed = await compressImage(file);
-      // Remplace le fichier de l'input par la version compressée.
+      // Transfère la version compressée vers l'input NOMMÉ (photo_file).
       const dt = new DataTransfer();
       dt.items.add(compressed);
-      input.files = dt.files;
+      if (fileInputRef.current) fileInputRef.current.files = dt.files;
       setPhotoPreview(URL.createObjectURL(compressed));
       setPhotoSize(compressed.size);
       setPhotoMode("new");
     } catch {
       // Repli sur l'original si la compression échoue.
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      if (fileInputRef.current) fileInputRef.current.files = dt.files;
       setPhotoPreview(URL.createObjectURL(file));
       setPhotoSize(file.size);
       setPhotoMode("new");
     } finally {
       setCompressing(false);
+      if (sourceInput !== fileInputRef.current) sourceInput.value = "";
     }
   }
 
   // Abandon de la nouvelle photo : on revient à la photo actuelle (ou aucune).
   function clearNewPhoto() {
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     setPhotoPreview(null);
     setPhotoSize(null);
@@ -305,12 +308,23 @@ export default function EditMemberForm({ member }: { member: Member }) {
                 </p>
               )}
 
-              {/* Input fichier unique : capture dynamique */}
+              {/* Input NOMMÉ (soumis avec le formulaire) : sélection fichier. */}
               <input
                 ref={fileInputRef}
                 type="file"
                 name="photo_file"
                 accept="image/jpeg,image/png,image/webp"
+                onChange={onPhotoChange}
+                className="hidden"
+              />
+              {/* Input caméra DÉDIÉ (sans name) : accept="image/*" + capture
+                  ouvre la caméra arrière sur mobile (iOS incluse). Le fichier
+                  capturé est transféré vers l'input nommé ci-dessus. */}
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
                 onChange={onPhotoChange}
                 className="hidden"
               />

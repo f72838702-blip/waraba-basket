@@ -50,30 +50,37 @@ function FormBlock({ onReset }: { onReset: () => void }) {
     initialState
   );
 
+  // Deux inputs séparés pour fiabiliser la caméra sur mobile :
+  // - fileInputRef : input NOMMÉ « photo_file » (soumis avec le formulaire),
+  //   accepte les fichiers image classiques (galerie / sélecteur).
+  // - cameraInputRef : input DÉDIÉ caméra (accept="image/*" + capture), sans
+  //   name. Le fichier capturé est compressé puis transféré vers fileInputRef
+  //   (cf. onPhotoChange). Séparer les inputs évite le basculement dynamique
+  //   de l'attribut `capture`, peu fiable sur iOS Safari notamment, et
+  //   `accept="image/*"` est nécessaire pour qu'iOS honore `capture`.
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoSize, setPhotoSize] = useState<number | null>(null);
   const [compressing, setCompressing] = useState(false);
 
-  // Ouvre le sélecteur : `capture` force la caméra arrière sur mobile, absent
-  // pour laisser le choix galerie/fichier.
+  // Ouvre la caméra (useCamera=true) ou le sélecteur de fichiers.
   function pickPhoto(useCamera: boolean) {
-    const el = fileInputRef.current;
+    const el = useCamera ? cameraInputRef.current : fileInputRef.current;
     if (!el) return;
-    if (useCamera) {
-      el.setAttribute("capture", "environment");
-    } else {
-      el.removeAttribute("capture");
-    }
+    // Réinitialise pour permettre de reprendre/rechoisir la même photo.
+    el.value = "";
     el.click();
   }
 
-  // À la sélection, la photo est compressée en arrière-plan (redimensionnée
-  // + ré-encodée en JPEG léger) puis remplace le fichier de l'input : le
-  // formulaire enverra donc la version légère, pas l'original.
+  // À la sélection (caméra ou fichier), la photo est compressée en arrière-plan
+  // (redimensionnée + ré-encodée en JPEG léger) puis transférée vers l'input
+  // NOMMÉ « photo_file » : le formulaire enverra donc la version légère, quel
+  // que soit l'input source. L'input caméra (non nommé) est ensuite réinitialisé
+  // pour permettre de reprendre la même photo.
   async function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const input = e.target;
-    const file = input.files?.[0];
+    const sourceInput = e.target;
+    const file = sourceInput.files?.[0];
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     if (!file) {
       setPhotoPreview(null);
@@ -84,24 +91,29 @@ function FormBlock({ onReset }: { onReset: () => void }) {
     setCompressing(true);
     try {
       const compressed = await compressImage(file);
-      // Remplace le fichier de l'input par la version compressée via
-      // DataTransfer (supporté par les navigateurs modernes).
       const dt = new DataTransfer();
       dt.items.add(compressed);
-      input.files = dt.files;
+      if (fileInputRef.current) fileInputRef.current.files = dt.files;
       setPhotoPreview(URL.createObjectURL(compressed));
       setPhotoSize(compressed.size);
     } catch {
       // Repli : on garde l'original si la compression échoue.
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      if (fileInputRef.current) fileInputRef.current.files = dt.files;
       setPhotoPreview(URL.createObjectURL(file));
       setPhotoSize(file.size);
     } finally {
       setCompressing(false);
+      // Libère l'input source quand ce n'est pas l'input nommé (caméra), pour
+      // pouvoir reprendre la même photo ensuite.
+      if (sourceInput !== fileInputRef.current) sourceInput.value = "";
     }
   }
 
   function clearPhoto() {
     if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
     if (photoPreview) URL.revokeObjectURL(photoPreview);
     setPhotoPreview(null);
     setPhotoSize(null);
@@ -249,12 +261,25 @@ function FormBlock({ onReset }: { onReset: () => void }) {
               </div>
             )}
 
-            {/* Input fichier unique : capture dynamique selon le bouton cliqué */}
+            {/* Input NOMMÉ (soumis avec le formulaire) : sélection fichier.
+                C'est lui qui porte réellement la photo envoyée au serveur. */}
             <input
               ref={fileInputRef}
               type="file"
               name="photo_file"
               accept="image/jpeg,image/png,image/webp"
+              onChange={onPhotoChange}
+              className="hidden"
+            />
+            {/* Input caméra DÉDIÉ (sans name) : accept="image/*" + capture
+                ouvre directement la caméra arrière sur mobile (iOS incluse).
+                Le fichier capturé est transféré vers l'input nommé ci-dessus
+                après compression ; il n'est jamais soumis directement. */}
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
               onChange={onPhotoChange}
               className="hidden"
             />
