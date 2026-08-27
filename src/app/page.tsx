@@ -28,6 +28,8 @@ import {
 } from "@/lib/contact";
 import { getAllMembers } from "@/lib/members-data";
 import { getPublishedPosts } from "@/lib/posts-data";
+import { getSiteImageOverrides } from "@/lib/site-images-data";
+import { resolveSiteImage, type SiteImageKey } from "@/lib/site-images";
 import { categoryLabel, formatPostDate } from "@/types/post";
 
 /* ============================================================
@@ -36,47 +38,31 @@ import { categoryLabel, formatPostDate } from "@/types/post";
    Mobile-first, Tailwind CSS, icônes Lucide-react.
    ============================================================ */
 
-// --- Les catégories de l'académie (photos dans /images) ---
-const teams = [
+// --- Les catégories de l'académie (images remplaçables depuis /admin/images) ---
+const teams: { key: SiteImageKey; name: string; desc: string }[] = [
+  { key: "u10", name: "U10", desc: "Détection & initiation aux fondamentaux." },
   {
-    img: "/images/u10.jpg",
-    name: "U10",
-    desc: "Détection & initiation aux fondamentaux.",
-  },
-  {
-    img: "/images/u11.jpg",
+    key: "u11",
     name: "U11",
     desc: "Apprentissage technique & esprit d'équipe.",
   },
+  { key: "u14", name: "U14", desc: "Compétition régionale & progression." },
   {
-    img: "/images/u14.jpg",
-    name: "U14",
-    desc: "Compétition régionale & progression.",
-  },
-  {
-    img: "/images/u15.jpg",
+    key: "u15",
     name: "U15",
     desc: "Excellence & performance sur le parquet.",
   },
   {
-    img: "/images/feminine.jpg",
+    key: "feminine",
     name: "Équipe féminine",
     desc: "La fierté de l'académie, basket au féminin.",
   },
 ];
 
 // --- L'encadrement technique ---
-const staff = [
-  {
-    img: "/images/coach.jpg",
-    name: "Le Coach",
-    role: "Entraîneur principal",
-  },
-  {
-    img: "/images/staff.jpg",
-    name: "Le Staff",
-    role: "Coach & adjoint",
-  },
+const staff: { key: SiteImageKey; name: string; role: string }[] = [
+  { key: "coach", name: "Le Coach", role: "Entraîneur principal" },
+  { key: "staff", name: "Le Staff", role: "Coach & adjoint" },
 ];
 
 // Régénère la page au plus toutes les 10 min en filet de sécurité ; les
@@ -90,6 +76,10 @@ export default async function Home() {
 
   // Articles publiés (admin → section « À la une », masquée si aucun).
   const posts = await getPublishedPosts(6);
+
+  // Images de l'accueil : remplacements admin (Supabase) > défauts locaux.
+  const siteImages = await getSiteImageOverrides();
+  const imgFor = (key: SiteImageKey) => resolveSiteImage(siteImages, key);
   // Le prochain match (catégorie match, date future la plus proche) reçoit
   // le badge spécial « Prochain match ».
   const today = new Date().toISOString().slice(0, 10);
@@ -158,7 +148,7 @@ export default async function Home() {
       {/* ===== HERO ===== */}
       <section className="relative flex min-h-[92vh] items-center overflow-hidden pt-16">
         <Image
-          src="/images/feminine.jpg"
+          src={imgFor("hero")}
           alt="Équipe féminine de la Matam Waraba Basketball Academy"
           fill
           priority
@@ -261,7 +251,7 @@ export default async function Home() {
 
               <div className="relative h-56 overflow-hidden">
                 <Image
-                  src={team.img}
+                  src={imgFor(team.key) as string}
                   alt={`Équipe ${team.name} — Matam Waraba`}
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
@@ -306,7 +296,7 @@ export default async function Home() {
 
                 <div className="relative h-72 overflow-hidden">
                   <Image
-                    src={person.img}
+                    src={imgFor(person.key) as string}
                     alt={`${person.name} — Matam Waraba`}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"

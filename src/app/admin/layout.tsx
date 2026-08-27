@@ -42,6 +42,12 @@ export default async function AdminLayout({
                 Articles
               </Link>
               <Link
+                href="/admin/images"
+                className="text-sm text-slate-300 transition hover:text-gold-light"
+              >
+                Images
+              </Link>
+              <Link
                 href="/admin/messages"
                 className="text-sm text-slate-300 transition hover:text-gold-light"
               >

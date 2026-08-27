@@ -28,6 +28,15 @@ import {
 } from "@/lib/posts-data";
 import type { MemberStatus } from "@/types/member";
 import { POST_CATEGORIES, type PostCategory } from "@/types/post";
+import {
+  SITE_IMAGE_SLOTS,
+  type SiteImageKey,
+} from "@/lib/site-images";
+import {
+  getSiteImageUrl,
+  setSiteImage,
+  deleteSiteImage,
+} from "@/lib/site-images-data";
 
 /**
  * Server Actions du back-office admin.
@@ -510,4 +519,71 @@ export async function deletePostAction(
   revalidatePath("/");
   revalidatePath("/admin/posts");
   return { ok: true, title };
+}
+
+// ---- Images de la page d'accueil (/admin/images) ----
+
+export type SiteImageState = { ok?: boolean; error?: string; key?: string };
+
+const SITE_IMAGE_KEYS = SITE_IMAGE_SLOTS.map((s) => s.key);
+
+/** Clé de slot attendue ; inconnu → null (protections côté serveur). */
+function parseSiteImageKey(formData: FormData): SiteImageKey | null {
+  const k = str(formData.get("key"));
+  return SITE_IMAGE_KEYS.includes(k as SiteImageKey) ? (k as SiteImageKey) : null;
+}
+
+/** Téléverse et applique une nouvelle image sur un slot de l'accueil. */
+export async function updateSiteImageAction(
+  _prev: SiteImageState,
+  formData: FormData
+): Promise<SiteImageState> {
+  if (!(await isAdmin())) {
+    return { error: "Non autorisé. Veuillez vous reconnecter." };
+  }
+
+  const key = parseSiteImageKey(formData);
+  if (!key) return { error: "Emplacement d'image inconnu." };
+
+  const file = formData.get("image_file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Choisissez une image à téléverser.", key };
+  }
+
+  const uploaded = await uploadMemberPhoto(file);
+  if ("error" in uploaded) return { error: `Image : ${uploaded.error}`, key };
+
+  const previous = await getSiteImageUrl(key);
+  const result = await setSiteImage(key, uploaded.url);
+  if ("error" in result) {
+    await deleteMemberPhoto(uploaded.url); // ne pas laisser d'objet orphelin
+    return { error: result.error, key };
+  }
+  await deleteMemberPhoto(previous); // libère l'ancienne image (best-effort)
+
+  revalidatePath("/");
+  revalidatePath("/admin/images");
+  return { ok: true, key };
+}
+
+/** Retour à l'image par défaut d'un slot (+ nettoyage Storage best-effort). */
+export async function resetSiteImageAction(
+  _prev: SiteImageState,
+  formData: FormData
+): Promise<SiteImageState> {
+  if (!(await isAdmin())) {
+    return { error: "Non autorisé. Veuillez vous reconnecter." };
+  }
+
+  const key = parseSiteImageKey(formData);
+  if (!key) return { error: "Emplacement d'image inconnu." };
+
+  const previous = await getSiteImageUrl(key);
+  const result = await deleteSiteImage(key);
+  if ("error" in result) return { error: result.error, key };
+  await deleteMemberPhoto(previous);
+
+  revalidatePath("/");
+  revalidatePath("/admin/images");
+  return { ok: true, key };
 }
