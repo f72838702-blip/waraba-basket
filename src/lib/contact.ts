@@ -18,3 +18,9 @@ export const WHATSAPP_PREFILL =
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   WHATSAPP_PREFILL
 )}`;
+
+/** Email officiel du club (section contact + footer). */
+export const CONTACT_EMAIL = "warababasket@gmail.com";
+
+/** Page Facebook officielle de l'académie. */
+export const FACEBOOK_URL = "https://www.facebook.com/share/1FCPaUsVBv/";

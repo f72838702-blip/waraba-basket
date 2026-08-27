@@ -9,6 +9,7 @@ import {
   Mail,
   Send,
   MapPin,
+  Facebook,
 } from "lucide-react";
 import {
   LionMark,
@@ -17,7 +18,12 @@ import {
   WhatsAppIcon,
 } from "@/components/brand";
 import ContactForm from "@/components/ContactForm";
-import { WHATSAPP_URL, WHATSAPP_DISPLAY } from "@/lib/contact";
+import {
+  WHATSAPP_URL,
+  WHATSAPP_DISPLAY,
+  CONTACT_EMAIL,
+  FACEBOOK_URL,
+} from "@/lib/contact";
 import { getAllMembers } from "@/lib/members-data";
 
 /* ============================================================
@@ -380,11 +386,31 @@ export default async function Home() {
 
             <div className="relative z-10 space-y-2 text-sm text-slate-300">
               <p className="flex items-center gap-2">
-                <WhatsAppIcon className="h-4 w-4 text-[#25D366]" />
+                <WhatsAppIcon className="h-4 w-4 shrink-0 text-[#25D366]" />
                 {WHATSAPP_DISPLAY}
               </p>
               <p className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-amber-400" />
+                <Mail className="h-4 w-4 shrink-0 text-amber-400" />
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="transition hover:text-amber-400"
+                >
+                  {CONTACT_EMAIL}
+                </a>
+              </p>
+              <p className="flex items-center gap-2">
+                <Facebook className="h-4 w-4 shrink-0 text-[#1877F2]" />
+                <a
+                  href={FACEBOOK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-amber-400"
+                >
+                  Suivez-nous sur Facebook
+                </a>
+              </p>
+              <p className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 shrink-0 text-amber-400" />
                 Bluezone de Dixinn, Conakry
               </p>
             </div>
@@ -481,6 +507,26 @@ export default async function Home() {
                   className="transition hover:text-amber-400"
                 >
                   {WHATSAPP_DISPLAY}
+                </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Mail className="h-4 w-4 shrink-0 text-amber-400" />
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="transition hover:text-amber-400"
+                >
+                  {CONTACT_EMAIL}
+                </a>
+              </li>
+              <li className="flex items-center gap-2">
+                <Facebook className="h-4 w-4 shrink-0 text-[#1877F2]" />
+                <a
+                  href={FACEBOOK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-amber-400"
+                >
+                  Facebook — Matam Waraba
                 </a>
               </li>
             </ul>
