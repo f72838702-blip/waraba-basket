@@ -7,11 +7,14 @@ const dir = path.join(__dirname, "..", "public", "images");
 
 // maxDimension = limite de la plus grande arête (px), quality = qualité JPEG.
 const jobs = [
-  { file: "hero.jpg", maxDimension: 1920, quality: 82 },
-  { file: "team.jpg", maxDimension: 1600, quality: 82 },
-  { file: "action-1.jpg", maxDimension: 1280, quality: 82 },
-  { file: "action-2.jpg", maxDimension: 1200, quality: 82 },
-  { file: "action-3.jpg", maxDimension: 1280, quality: 82 },
+  { file: "feminine.jpg", maxDimension: 1920, quality: 82 },
+  { file: "u10.jpg", maxDimension: 1280, quality: 82 },
+  { file: "u11.jpg", maxDimension: 1280, quality: 82 },
+  { file: "u14.jpg", maxDimension: 1280, quality: 82 },
+  { file: "u15.jpg", maxDimension: 1280, quality: 82 },
+  { file: "coach.jpg", maxDimension: 1440, quality: 82 },
+  { file: "staff.jpg", maxDimension: 1280, quality: 82 },
+  { file: "logo.jpg", maxDimension: 1024, quality: 85 },
 ];
 
 (async () => {
