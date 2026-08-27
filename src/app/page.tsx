@@ -87,15 +87,64 @@ export default async function Home() {
 
   return (
     <main className="flex flex-1 flex-col bg-blue-950 text-slate-100">
+      {/* ===== NAVBAR FIXE (glass) ===== */}
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-amber-500/20 bg-blue-950/70 backdrop-blur-md no-print">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3">
+          {/* Logo + nom */}
+          <a href="#" className="flex items-center gap-3">
+            <Image
+              src="/images/logo.jpg"
+              alt="Logo Matam Waraba"
+              width={40}
+              height={40}
+              className="h-10 w-10 rounded-full border border-amber-500/60 object-cover"
+            />
+            <span className="flex flex-col leading-tight">
+              <span className="text-base font-black tracking-tight text-white">
+                Matam Waraba
+              </span>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-400">
+                Basketball Academy
+              </span>
+            </span>
+          </a>
+
+          {/* Liens (desktop) */}
+          <nav className="hidden items-center gap-7 text-sm font-medium text-slate-200 md:flex">
+            <a href="#equipes" className="transition hover:text-amber-400">
+              Équipes
+            </a>
+            <a href="#encadrement" className="transition hover:text-amber-400">
+              Encadrement
+            </a>
+            <a href="/members" className="transition hover:text-amber-400">
+              Effectif
+            </a>
+            <a href="#contact" className="transition hover:text-amber-400">
+              Contact
+            </a>
+          </nav>
+
+          {/* CTA */}
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-4 py-2 text-sm font-bold text-blue-950 transition hover:bg-amber-400"
+          >
+            <Users className="h-4 w-4" />
+            Nous rejoindre
+          </a>
+        </div>
+      </header>
+
       {/* ===== HERO ===== */}
-      <section className="relative flex min-h-[92vh] items-center overflow-hidden">
+      <section className="relative flex min-h-[92vh] items-center overflow-hidden pt-16">
         <Image
           src="/images/feminine.jpg"
           alt="Équipe féminine de la Matam Waraba Basketball Academy"
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-cover object-top"
         />
         {/* Voiles Bleu Royal (remplace le midnight d'origine) */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-950/85 via-blue-950/70 to-blue-950" />
@@ -103,18 +152,10 @@ export default async function Home() {
         {/* Filigrane lion + terrain, très discret */}
         <LionWatermark tone="gold" />
 
-        {/* Basket animé flottant */}
-        <span className="animate-float absolute right-[12%] top-[22%] hidden text-7xl opacity-80 drop-shadow-2xl md:block">
-          🏀
-        </span>
-        <span className="animate-float-slow absolute left-[10%] top-[60%] hidden text-5xl opacity-60 md:block">
-          🏀
-        </span>
-
         <div className="relative z-10 mx-auto w-full max-w-5xl px-6 text-center">
           <span className="animate-fade-up mb-6 inline-flex items-center gap-2 rounded-full border border-amber-500/50 bg-blue-950/50 px-4 py-1.5 text-sm font-medium text-amber-400 backdrop-blur">
-            <Star className="h-4 w-4 fill-amber-400" />
-            Basketball Academy • Saison 2026-2027
+            <Trophy className="h-4 w-4" />
+            Basketball Academy • Conakry • Saison 2026-2027
           </span>
           <h1 className="animate-fade-up bg-gradient-to-r from-white via-amber-300 to-white bg-clip-text text-6xl font-black tracking-tight text-transparent drop-shadow-2xl sm:text-8xl">
             Matam Waraba
@@ -365,22 +406,99 @@ export default async function Home() {
 
       {/* ===== FOOTER ===== */}
       <footer className="border-t border-amber-500/30 bg-blue-950">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 py-10 text-center">
-          {/* Logo lion doré + nom de l'académie */}
-          <div className="flex items-center gap-2">
-            <LionMark className="h-8 w-8 text-amber-400" faceColor="#172554" />
-            <span className="text-lg font-black text-amber-400">
-              Matam Waraba
-            </span>
+        <div className="mx-auto grid max-w-5xl gap-10 px-6 py-14 sm:grid-cols-3">
+          {/* Colonne 1 : identité */}
+          <div className="flex flex-col items-start gap-3">
+            <div className="flex items-center gap-3">
+              <Image
+                src="/images/logo.jpg"
+                alt="Logo Matam Waraba"
+                width={44}
+                height={44}
+                className="h-11 w-11 rounded-full border border-amber-500/60 object-cover"
+              />
+              <span className="flex flex-col leading-tight">
+                <span className="font-black text-amber-400">Matam Waraba</span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  Basketball Academy
+                </span>
+              </span>
+            </div>
+            <p className="text-sm leading-6 text-slate-400">
+              L&apos;académie qui forme les talents du basketball guinéen, de
+              l&apos;initiation jusqu&apos;à l&apos;excellence sur le parquet.
+            </p>
           </div>
-          {/* Séparateur doré fin */}
-          <div className="h-px w-24 bg-amber-500/40" />
-          <p className="text-sm text-slate-400">
-            © {new Date().getFullYear()} Matam Waraba. Tous droits réservés.
-          </p>
-          <p className="text-xs text-slate-500">
-            Bluezone de Dixinn, Conakry • Basketball Academy
-          </p>
+
+          {/* Colonne 2 : navigation */}
+          <div>
+            <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-amber-400">
+              Navigation
+            </h4>
+            <ul className="space-y-2.5 text-sm text-slate-300">
+              <li>
+                <a href="#equipes" className="transition hover:text-amber-400">
+                  Nos équipes
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#encadrement"
+                  className="transition hover:text-amber-400"
+                >
+                  Encadrement
+                </a>
+              </li>
+              <li>
+                <a href="/members" className="transition hover:text-amber-400">
+                  Effectif officiel
+                </a>
+              </li>
+              <li>
+                <a href="#contact" className="transition hover:text-amber-400">
+                  Contact & inscriptions
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Colonne 3 : contact */}
+          <div>
+            <h4 className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-amber-400">
+              Nous trouver
+            </h4>
+            <ul className="space-y-2.5 text-sm text-slate-300">
+              <li className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 shrink-0 text-amber-400" />
+                Bluezone de Dixinn, Conakry — Guinée
+              </li>
+              <li className="flex items-center gap-2">
+                <WhatsAppIcon className="h-4 w-4 shrink-0 text-[#25D366]" />
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-amber-400"
+                >
+                  {WHATSAPP_DISPLAY}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Barre de copyright */}
+        <div className="border-t border-amber-500/20">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-1 px-6 py-5 text-center sm:flex-row sm:justify-between sm:text-left">
+            <p className="text-xs text-slate-500">
+              © {new Date().getFullYear()} Matam Waraba Basketball Academy.
+              Tous droits réservés.
+            </p>
+            <p className="flex items-center gap-1.5 text-xs text-slate-500">
+              <LionMark className="h-4 w-4 text-amber-400" faceColor="#172554" />
+              Waraba — le lion ne recule jamais
+            </p>
+          </div>
         </div>
       </footer>
     </main>

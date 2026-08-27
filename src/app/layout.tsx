@@ -23,9 +23,30 @@ const script = Dancing_Script({
 });
 
 export const metadata: Metadata = {
-  title: "Matam Waraba — Basketball Academy",
+  metadataBase: new URL("https://waraba-basket.vercel.app"),
+  title: {
+    default: "Matam Waraba — Basketball Academy",
+    template: "%s — Matam Waraba",
+  },
   description:
-    "Site officiel de la Matam Waraba Basketball Academy : actualités, effectif, calendrier et billetterie.",
+    "Site officiel de la Matam Waraba Basketball Academy à Conakry : équipes U10 à U15, équipe féminine, effectif, encadrement et inscriptions.",
+  keywords: [
+    "Matam Waraba",
+    "basketball",
+    "académie",
+    "Conakry",
+    "Guinée",
+    "Bluezone de Dixinn",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "Matam Waraba Basketball Academy",
+    title: "Matam Waraba — Basketball Academy",
+    description:
+      "L'académie de basketball qui forme les talents de demain à Conakry — de l'initiation jusqu'à l'excellence sur le parquet.",
+    images: [{ url: "/images/logo.jpg", width: 1440, height: 960 }],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
